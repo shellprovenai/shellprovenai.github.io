@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>awk for people who hate awk: 8 one-liners that answer real questions about a log — ShellProven</title>
+<meta name="description" content="awk looks cryptic, but most real uses follow one pattern: a condition, then an action in braces. Using a small web server log, this video builds eight practical one-liners: pick columns, filter errors, sum bytes, compute an average, count requests per IP, read CSV with -F, use $NF, and avoid the double-quote trap that makes awk print whole lines.">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="awk for people who hate awk: 8 one-liners that answer real questions about a log — ShellProven">
+<meta property="og:description" content="awk looks cryptic, but most real uses follow one pattern: a condition, then an action in braces. Using a small web server log, this video builds eight practical one-liners: pick columns, filter errors, sum bytes, compute an average, count requests per IP, read CSV with -F, use $NF, and avoid the double-quote trap that makes awk print whole lines.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/awk-log-one-liners" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 10 · tested on Debian 13</span>
+    <h1>awk for people who hate awk: 8 one-liners that answer real questions about a log</h1>
+    <p class="sub">awk looks cryptic, but most real uses follow one pattern: a condition, then an action in braces. Using a small web server log, this video builds eight practical one-liners: pick columns, filter errors, sum bytes, compute an average, count requests per IP, read CSV with -F, use $NF, and avoid the double-quote trap that makes awk print whole lines.</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <div class="two">
+    <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/awk-log-one-liners">terminal-tutorials/awk-log-one-liners</a>.</p>
+      <pre><code># The log and the one idea
+$ cat access.log
+10.0.0.5 GET /index.html 200 5120 12
+10.0.0.7 GET /login 200 2048 30
+10.0.0.5 POST /login 302 512 45
+10.0.0.9 GET /admin 404 256 3
+10.0.0.7 GET /api/orders 500 128 950
+10.0.0.5 GET /missing.png 404 256 2
+10.0.0.9 GET /api/orders 200 8192 120
+10.0.0.7 GET /index.html 200 5120 10
+
+# 1. Pick columns
+$ awk '{print $1, $4}' access.log
+10.0.0.5 200
+10.0.0.7 200
+10.0.0.5 302
+10.0.0.9 404
+10.0.0.7 500
+10.0.0.5 404
+10.0.0.9 200
+10.0.0.7 200
+
+# 2. Filter lines with a condition
+$ awk '$4 &gt;= 400' access.log
+10.0.0.9 GET /admin 404 256 3
+10.0.0.7 GET /api/orders 500 128 950
+10.0.0.5 GET /missing.png 404 256 2
+$ awk '$4 == 404 {print $3}' access.log
+/admin
+/missing.png
+
+# 3. Sum and average
+$ awk '{sum += $5} END {print sum, "bytes"}' access.log
+21632 bytes
+$ awk '{t += $6; n++} END {printf "avg %.1f ms over %d requests\n", t/n, n}' access.log
+avg 146.5 ms over 8 requests
+
+# 4. Count per value
+$ awk '{c[$1]++} END {for (ip in c) print c[ip], ip}' access.log | sort -rn
+3 10.0.0.7
+3 10.0.0.5
+2 10.0.0.9
+
+# 5. Other separators and the last field
+$ awk -F, 'NR &gt; 1 {print $2 " lives in " $3}' users.csv
+Ana lives in Lisbon
+Tom lives in Leeds
+Mia lives in Graz
+$ awk '$NF &gt; 100 {print $NF " ms", $3}' access.log
+950 ms /api/orders
+120 ms /api/orders
+
+# The double-quote trap
+$ awk "{print $1}" access.log
+10.0.0.5 GET /index.html 200 5120 12
+10.0.0.7 GET /login 200 2048 30
+10.0.0.5 POST /login 302 512 45
+10.0.0.9 GET /admin 404 256 3
+10.0.0.7 GET /api/orders 500 128 950
+10.0.0.5 GET /missing.png 404 256 2
+10.0.0.9 GET /api/orders 200 8192 120
+10.0.0.7 GET /index.html 200 5120 10</code></pre>
+    </section>
+    <section class="quiz" id="quiz">
+      <h2>Quick check</h2>
+      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "q": "Why does awk \"{print $1}\" access.log print whole lines?", "opts": ["awk does not accept double quotes", "The shell replaced $1 inside the double quotes", "$1 means the whole line"], "a": 1, "expl": "Bash swapped dollar one for its own empty variable before awk ran. Use single quotes around awk programs."}, {"type": "choice", "q": "Which awk variable always holds the last field of a line?", "opts": ["$0", "$NF", "NR"], "a": 1, "expl": "NF is the number of fields, so $NF is the last one."}]</script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
+
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  var root=document.getElementById('quiz-root');
+  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
+  qs.forEach(function(q,i){
+    var box=document.createElement('div'); box.className='q';
+    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
+    var fb=document.createElement('p'); fb.className='fb';
+    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
+    if(q.type==='choice'){
+      var opts=document.createElement('div'); opts.className='opts';
+      q.opts.forEach(function(o,j){
+        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
+        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
+        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else {
+      var row=document.createElement('div'); row.className='row';
+      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
+      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
+      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
+      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
+      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
+    }
+    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>
