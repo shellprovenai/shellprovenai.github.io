@@ -1,0 +1,15 @@
+{
+  "_opis": "Źródło prawdy dla slugów lekcji: katalog TOR-A → slug URL (lekcje/<slug>/ i terminal-tutorials/<slug>/). Pola youtube_id uzupełnia zarządca po uploadzie; index.html i lekcje/index.html mają być z tym zgodne.",
+  "lekcje": [
+    {"num":"01","katalog":"01-find-zmienione-24h","slug":"find-changed-24h","title":"Find files changed in the last 24 hours (and the -mtime +1 trap)","youtube_id":""},
+    {"num":"02","katalog":"02-grep-r-wykluczenia","slug":"grep-r-excludes","title":"Search a whole project with grep -r, without node_modules, .git or binary junk","youtube_id":""},
+    {"num":"03","katalog":"03-git-cofanie","slug":"git-undo","title":"Undo anything in Git: restore vs reset vs revert (live demos)","youtube_id":""},
+    {"num":"04","katalog":"04-uprawnienia-chmod","slug":"chmod-permissions","title":"Linux file permissions: read ls -l, fix \"Permission denied\", and never chmod 777","youtube_id":""},
+    {"num":"05","katalog":"05-sqlite-csv","slug":"sqlite-csv","title":"SQLite in the terminal: query a CSV file in 5 minutes (and the text-number trap)","youtube_id":""},
+    {"num":"06","katalog":"06-przekierowania","slug":"bash-redirection","title":"Bash redirection explained: >, >>, 2>, 2>&1 and | (and why the order matters)","youtube_id":""},
+    {"num":"07","katalog":"07-du-df-dysk","slug":"disk-space-df-du","title":"Disk full? Find what's eating your space with df, du and sort (Linux)","youtube_id":""},
+    {"num":"08","katalog":"08-ssh-klucze","slug":"ssh-keys","title":"SSH keys from scratch: generate, install, shortcut with ~/.ssh/config, turn off passwords","youtube_id":""},
+    {"num":"09","katalog":"09-cron-nie-dziala","slug":"cron-not-running","title":"Cron job not running? It works in the terminal, here's why it fails in cron","youtube_id":""},
+    {"num":"10","katalog":"10-awk-logi","slug":"awk-log-one-liners","title":"awk for people who hate awk: 8 one-liners that answer real questions about a log","youtube_id":""}
+  ]
+}

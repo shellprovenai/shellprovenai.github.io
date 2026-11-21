@@ -3,13 +3,94 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ShellProven</title>
-<style>body{font-family:system-ui,sans-serif;max-width:40rem;margin:3rem auto;padding:0 1rem;line-height:1.5}</style>
+<title>ShellProven — terminal tutorials, tested</title>
+<meta name="description" content="Linux and bash tutorials where every command runs in a fresh Debian container before you see it. Real output, published commands, a two-question quick check at the end of each lesson.">
+<link rel="icon" href="img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="ShellProven — terminal tutorials, tested">
+<meta property="og:description" content="Every command runs in a fresh Debian container before you see it. Real output. Published commands. Quick check at the end.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+<meta property="og:url" content="https://shellprovenai.github.io/">
 </head>
 <body>
-<h1>ShellProven</h1>
-<p>Terminal tutorials, tested. Every command shown in a ShellProven video is executed in a clean Linux container before publishing, and the exact commands are published in a public repository alongside each video.</p>
-<p>Videos are produced with the help of AI tools (script drafting, text-to-speech narration) under human review, and are labelled as such on YouTube.</p>
-<p><a href="https://www.youtube.com/@ShellProven">YouTube channel</a> · <a href="https://github.com/shellprovenai">GitHub</a> · <a href="privacy.html">Privacy policy</a></p>
+<header class="top"><div class="wrap">
+  <a class="brand" href="/"><img src="img/profil.png" alt="">ShellProven</a>
+  <nav class="nav">
+    <a href="#lessons">Lessons</a>
+    <a href="#how" class="hide-s">How it works</a>
+    <a href="https://www.youtube.com/@ShellProven">YouTube</a>
+    <a href="https://github.com/shellprovenai/terminal-tutorials" class="hide-s">Commands</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <h1>Terminal tutorials, <em>tested.</em></h1>
+      <p class="lead">Every command you see in a ShellProven video was run in a fresh Debian container first. The output on screen is the real one. The commands are published so you can check them yourself.</p>
+      <div class="cta">
+        <a class="btn primary" href="https://www.youtube.com/@ShellProven">▶ Watch on YouTube</a>
+        <a class="btn" href="#lessons">Browse lessons</a>
+      </div>
+    </div>
+    <div class="art" aria-hidden="true">
+      <img class="robot" src="img/robot.png" alt="">
+      <img class="dog" src="img/pies.png" alt="">
+    </div>
+  </section>
+
+  <div class="term" aria-label="Example from a lesson">
+    <div class="bar"><i></i><i></i><i></i></div>
+<pre><code><span class="c"># Files changed in the last 24 hours — the trap is -mtime 1 vs -mtime -1</span>
+<span class="p">$</span> find . -type f -mtime -1
+./src/app.py
+./src/config.yaml
+./logs/app.log
+<span class="p">$</span> find . -type f -mtime 1      <span class="c"># "exactly one day old" — not what you wanted</span>
+./src/utils.py</code></pre>
+  </div>
+
+  <section id="how">
+    <h2>How it works</h2>
+    <p class="sub">Three rules, every lesson.</p>
+    <div class="cards">
+      <div class="card"><span class="n">01</span><h3>Run first, show second</h3><p>Each command is executed in a clean container and the recorded output is what you see. If it doesn't work, it doesn't ship.</p></div>
+      <div class="card"><span class="n">02</span><h3>Commands you can copy</h3><p>Every lesson has a folder in the public <a href="https://github.com/shellprovenai/terminal-tutorials">terminal-tutorials</a> repository: the commands, a setup script and the real log.</p></div>
+      <div class="card"><span class="n">03</span><h3>Quick check</h3><p>Two short questions at the end of each video, with the answer a few seconds later. Try them here on the lesson page, too.</p></div>
+    </div>
+  </section>
+
+  <section id="lessons">
+    <h2>Lessons</h2>
+    <p class="sub">Linux command line and bash — short, practical, with the traps called out.</p>
+    <div class="lessons" id="lesson-list">
+      <!-- generated from lekcje/lekcje.json; keep in sync -->
+      <a class="lesson" href="lekcje/find-changed-24h/"><span class="num">01</span><div><h3>Find files changed in the last 24 hours (and the -mtime +1 trap)</h3><p>find, -mtime vs -mmin, -newermt, pruning node_modules</p><div class="tags"><span class="tag">find</span><span class="tag">bash</span></div></div></a>
+      <a class="lesson" href="lekcje/grep-r-excludes/"><span class="num">02</span><div><h3>Search a whole project with grep -r, without node_modules, .git or binary junk</h3><p>grep -r, --exclude-dir, -I, -n and friends</p><div class="tags"><span class="tag">grep</span></div></div></a>
+      <a class="lesson" href="lekcje/git-undo/"><span class="num">03</span><div><h3>Undo anything in Git: restore vs reset vs revert (live demos)</h3><p>Which one to use, and which one rewrites history</p><div class="tags"><span class="tag">git</span></div></div></a>
+      <a class="lesson" href="lekcje/chmod-permissions/"><span class="num">04</span><div><h3>Linux file permissions: read ls -l, fix "Permission denied", and never chmod 777</h3><p>rwx, octal, chmod, chown — and the safe defaults</p><div class="tags"><span class="tag">chmod</span><span class="tag">permissions</span></div></div></a>
+      <a class="lesson" href="lekcje/sqlite-csv/"><span class="num">05</span><div><h3>SQLite in the terminal: query a CSV file in 5 minutes (and the text-number trap)</h3><p>.import, .mode, CAST and why your numbers sort wrong</p><div class="tags"><span class="tag">sqlite</span><span class="tag">csv</span></div></div></a>
+      <a class="lesson" href="lekcje/bash-redirection/"><span class="num">06</span><div><h3>Bash redirection explained: &gt;, &gt;&gt;, 2&gt;, 2&gt;&amp;1 and | (and why the order matters)</h3><p>stdout, stderr, pipes — with the order trap demonstrated</p><div class="tags"><span class="tag">bash</span><span class="tag">redirection</span></div></div></a>
+      <a class="lesson" href="lekcje/disk-space-df-du/"><span class="num">07</span><div><h3>Disk full? Find what's eating your space with df, du and sort (Linux)</h3><p>df -h, du -sh, sort -h, deleted-but-open files</p><div class="tags"><span class="tag">df</span><span class="tag">du</span></div></div></a>
+      <a class="lesson" href="lekcje/ssh-keys/"><span class="num">08</span><div><h3>SSH keys from scratch: generate, install, shortcut with ~/.ssh/config, turn off passwords</h3><p>ssh-keygen, ssh-copy-id, config aliases, sshd hardening</p><div class="tags"><span class="tag">ssh</span></div></div></a>
+      <a class="lesson" href="lekcje/cron-not-running/"><span class="num">09</span><div><h3>Cron job not running? It works in the terminal, here's why it fails in cron</h3><p>PATH, environment, percent signs, logging the output</p><div class="tags"><span class="tag">cron</span></div></div></a>
+      <a class="lesson" href="lekcje/awk-log-one-liners/"><span class="num">10</span><div><h3>awk for people who hate awk: 8 one-liners that answer real questions about a log</h3><p>fields, filters, counting, sums — nothing more</p><div class="tags"><span class="tag">awk</span><span class="tag">logs</span></div></div></a>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="note">
+      <img src="img/profil.png" alt="">
+      <p><strong>Transparency.</strong> The script and the narration are made with AI and reviewed by a human before publishing. The robot presenter and the dog are AI-generated cartoon characters — not real people. What is not generated: the commands and their output, which come from real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a> · <a href="mailto:shellprovenai@gmail.com">shellprovenai@gmail.com</a></span>
+</div></footer>
 </body>
 </html>
