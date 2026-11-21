@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Find files changed in the last 24 hours (and the -mtime +1 trap) — ShellProven</title>
+<meta name="description" content="Find every file that changed in the last 24 hours, understand why -mtime +1 silently skips files that are almost two days old, skip folders like node_modules with -prune (and why you need -print), and back up the results safely with -print0 and tar.">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Find files changed in the last 24 hours (and the -mtime +1 trap) — ShellProven">
+<meta property="og:description" content="Find every file that changed in the last 24 hours, understand why -mtime +1 silently skips files that are almost two days old, skip folders like node_modules with -prune (and why you need -print), and back up the results safely with -print0 and tar.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/find-changed-24h" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 01 · tested on Debian 13</span>
+    <h1>Find files changed in the last 24 hours (and the -mtime +1 trap)</h1>
+    <p class="sub">Find every file that changed in the last 24 hours, understand why -mtime +1 silently skips files that are almost two days old, skip folders like node_modules with -prune (and why you need -print), and back up the results safely with -print0 and tar.</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <div class="two">
+    <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/find-changed-24h">terminal-tutorials/find-changed-24h</a>.</p>
+      <pre><code># The demo folder
+$ find . -type f -printf '%TY-%Tm-%Td %TH:%TM  %p\n' | sort
+2026-11-16 18:19  ./LICENSE
+2026-11-19 16:19  ./src/old_notes.txt
+2026-11-19 19:19  ./README.md
+2026-11-20 12:19  ./src/utils.py
+2026-11-20 22:19  ./src/config.yaml
+2026-11-21 15:19  ./logs/app.log
+2026-11-21 17:19  ./node_modules/pkg/index.js
+2026-11-21 18:09  ./src/app.py
+
+# Modified in the last 24 hours: -mtime -1
+$ find . -type f -mtime -1
+./src/app.py
+./src/config.yaml
+./node_modules/pkg/index.js
+./logs/app.log
+
+# The trap: -mtime 1 and -mtime +1
+$ find . -type f -mtime 1
+./src/utils.py
+./README.md
+$ find . -type f -mtime +1
+./src/old_notes.txt
+./LICENSE
+
+# Exact times with -mmin
+$ find . -type f -mmin -120
+./src/app.py
+./node_modules/pkg/index.js
+
+# Human-readable dates with -newermt
+$ find . -type f -newermt '6 hours ago'
+./src/app.py
+./node_modules/pkg/index.js
+./logs/app.log
+$ find . -type f -newermt '2000-01-01' | wc -l
+8
+$ find . -type f -newermt '2 days ago' ! -newermt '1 day ago'
+./src/utils.py
+./README.md
+
+# Skipping folders with -prune
+$ find . -path ./node_modules -prune -o -type f -mmin -1440
+./src/app.py
+./src/config.yaml
+./node_modules
+./logs/app.log
+$ find . -path ./node_modules -prune -o -type f -mmin -1440 -print
+./src/app.py
+./src/config.yaml
+./logs/app.log
+
+# Show when each file changed
+$ find . -path ./node_modules -prune -o -type f -mmin -1440 -printf '%TY-%Tm-%Td %TH:%TM  %p\n' | sort
+2026-11-20 22:19  ./src/config.yaml
+2026-11-21 15:19  ./logs/app.log
+2026-11-21 18:09  ./src/app.py
+
+# Back up today's changes safely
+$ find . -path ./node_modules -prune -o -type f -mmin -1440 -print0 | tar --null -T - -czf /tmp/recent.tgz
+$ tar -tzvf /tmp/recent.tgz
+-rw-r--r-- root/root         5 2026-11-21 18:09 ./src/app.py
+-rw-r--r-- root/root         5 2026-11-20 22:19 ./src/config.yaml
+-rw-r--r-- root/root         5 2026-11-21 15:19 ./logs/app.log
+$ find . -path ./node_modules -prune -o -type f -mmin -1440 -exec ls -l {} +
+-rw-r--r-- 1 root root 5 Nov 21 15:19 ./logs/app.log
+-rw-r--r-- 1 root root 5 Nov 21 18:09 ./src/app.py
+-rw-r--r-- 1 root root 5 Nov 20 22:19 ./src/config.yaml</code></pre>
+    </section>
+    <section class="quiz" id="quiz">
+      <h2>Quick check</h2>
+      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "q": "I want every file changed in the last 24 hours. Do I use -mtime 1 or -mtime -1?", "opts": ["-mtime -1", "-mtime 1", "-mtime +1"], "a": 0, "expl": "-mtime -1 means less than one day old. Plain one means one to two days old."}, {"type": "choice", "q": "README.md is 47 hours old. Will find . -type f -mtime +1 list it?", "opts": ["Yes, +1 means older than 24 hours", "No: it needs two full days; use -mmin +1440"], "a": 1, "expl": "No. Forty-seven hours rounds down to one day, and one is not greater than one."}]</script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
+
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  var root=document.getElementById('quiz-root');
+  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
+  qs.forEach(function(q,i){
+    var box=document.createElement('div'); box.className='q';
+    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
+    var fb=document.createElement('p'); fb.className='fb';
+    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
+    if(q.type==='choice'){
+      var opts=document.createElement('div'); opts.className='opts';
+      q.opts.forEach(function(o,j){
+        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
+        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
+        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else {
+      var row=document.createElement('div'); row.className='row';
+      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
+      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
+      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
+      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
+      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
+    }
+    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>
