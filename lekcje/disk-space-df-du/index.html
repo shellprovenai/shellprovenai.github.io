@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Disk full? Find what&#x27;s eating your space with df, du and sort (Linux) — ShellProven</title>
+<meta name="description" content="A step-by-step way to find what&#x27;s filling a Linux disk: check the filesystem with df -h, drill down with du -sh and du --max-depth piped into sort -h, list the biggest files with find -size, empty a log safely with truncate, and solve the classic mystery where df says the disk is full but du can&#x27;t find the files (a deleted file that&#x27;s still open).">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Disk full? Find what&#x27;s eating your space with df, du and sort (Linux) — ShellProven">
+<meta property="og:description" content="A step-by-step way to find what&#x27;s filling a Linux disk: check the filesystem with df -h, drill down with du -sh and du --max-depth piped into sort -h, list the biggest files with find -size, empty a log safely with truncate, and solve the classic mystery where df says the disk is full but du can&#x27;t find the files (a deleted file that&#x27;s still open).">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/disk-space-df-du" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 07 · tested on Debian 13</span>
+    <h1>Disk full? Find what&#x27;s eating your space with df, du and sort (Linux)</h1>
+    <p class="sub">A step-by-step way to find what&#x27;s filling a Linux disk: check the filesystem with df -h, drill down with du -sh and du --max-depth piped into sort -h, list the biggest files with find -size, empty a log safely with truncate, and solve the classic mystery where df says the disk is full but du can&#x27;t find the files (a deleted file that&#x27;s still open).</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <div class="two">
+    <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/disk-space-df-du">terminal-tutorials/disk-space-df-du</a>.</p>
+      <pre><code># Step 1: which filesystem is full? df -h
+$ df -h /lab
+Filesystem      Size  Used Avail Use% Mounted on
+overlay          59G   21G   36G  37% /
+
+# Step 2: which folder? du -sh
+$ du -sh *
+93M	app
+205M	backups
+3.1M	uploads
+
+# Step 3: drill down with --max-depth and sort -h
+$ du -h --max-depth=2 . | sort -h
+3.1M	./uploads
+25M	./app/cache
+69M	./app/logs
+93M	./app
+205M	./backups
+300M	.
+$ du -ah . | sort -rh | head -6
+300M	.
+205M	./backups
+104M	./backups/db-2026-11.sql.gz
+100M	./backups/db-2026-10.sql.gz
+93M	./app
+69M	./app/logs
+
+# Step 4: list the big files with find
+$ find . -type f -size +50M -exec ls -lh {} +
+-rw-r--r-- 1 root root  60M Nov 21 19:39 ./app/logs/app.log.1
+-rw-r--r-- 1 root root 100M Nov 21 19:39 ./backups/db-2026-10.sql.gz
+-rw-r--r-- 1 root root 104M Nov 21 19:39 ./backups/db-2026-11.sql.gz
+
+# Step 5: free space safely
+$ truncate -s 0 app/logs/app.log.1 &amp;&amp; du -sh app
+33M	app
+
+# The mystery: df says full, du disagrees
+$ fallocate -l 200M big.tmp &amp;&amp; du -sh .
+440M	.
+$ sleep 600 &lt; big.tmp &amp;
+$ rm big.tmp &amp;&amp; du -sh .
+240M	.
+$ find /proc/*/fd -lname '*(deleted)' -printf '%p -&gt; %l\n' 2&gt;/dev/null
+/proc/120/fd/0 -&gt; /lab/srv/big.tmp (deleted)
+$ kill %1</code></pre>
+    </section>
+    <section class="quiz" id="quiz">
+      <h2>Quick check</h2>
+      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "q": "After du -h, why sort -h and not plain sort?", "opts": ["sort -h is faster", "sort -h understands sizes like 9M and 100M", "sort -h sorts by folder name"], "a": 1, "expl": "Plain sort compares text, so a hundred megabytes would land before nine megabytes."}, {"type": "choice", "q": "I deleted a 200 MB file, but df still counts the space as used. What is the likely cause?", "opts": ["The disk is damaged", "A process still has the deleted file open", "du skips hidden files"], "a": 1, "expl": "The space comes back only when that process closes the file, or is restarted."}]</script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
+
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  var root=document.getElementById('quiz-root');
+  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
+  qs.forEach(function(q,i){
+    var box=document.createElement('div'); box.className='q';
+    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
+    var fb=document.createElement('p'); fb.className='fb';
+    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
+    if(q.type==='choice'){
+      var opts=document.createElement('div'); opts.className='opts';
+      q.opts.forEach(function(o,j){
+        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
+        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
+        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else {
+      var row=document.createElement('div'); row.className='row';
+      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
+      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
+      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
+      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
+      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
+    }
+    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>
