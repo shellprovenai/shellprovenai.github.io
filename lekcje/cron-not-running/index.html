@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cron job not running? It works in the terminal, here&#x27;s why it fails in cron — ShellProven</title>
+<meta name="description" content="A script runs fine when you type it, but does nothing from cron. Using a real cron daemon, this video logs the job&#x27;s output to see the actual error, dumps cron&#x27;s environment to show its tiny PATH and different working directory, fixes both in the crontab, and explains the percent-sign trap that silently breaks date commands in cron.">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Cron job not running? It works in the terminal, here&#x27;s why it fails in cron — ShellProven">
+<meta property="og:description" content="A script runs fine when you type it, but does nothing from cron. Using a real cron daemon, this video logs the job&#x27;s output to see the actual error, dumps cron&#x27;s environment to show its tiny PATH and different working directory, fixes both in the crontab, and explains the percent-sign trap that silently breaks date commands in cron.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/cron-not-running" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 09 · tested on Debian 13</span>
+    <h1>Cron job not running? It works in the terminal, here&#x27;s why it fails in cron</h1>
+    <p class="sub">A script runs fine when you type it, but does nothing from cron. Using a real cron daemon, this video logs the job&#x27;s output to see the actual error, dumps cron&#x27;s environment to show its tiny PATH and different working directory, fixes both in the crontab, and explains the percent-sign trap that silently breaks date commands in cron.</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <div class="two">
+    <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/cron-not-running">terminal-tutorials/cron-not-running</a>.</p>
+      <pre><code># A script that works
+$ cat backup.sh
+#!/bin/sh
+report-tool &gt; report.txt
+echo "saved report"
+$ ./backup.sh &amp;&amp; cat report.txt
+saved report
+report for demo: 42 orders
+
+# Schedule it, and log the output
+$ cat first.cron
+# min hour day month weekday  command
+* * * * * /lab/jobs/backup.sh &gt;&gt; /tmp/backup.log 2&gt;&amp;1
+* * * * * env &gt; /tmp/cron-env.txt
+$ crontab first.cron &amp;&amp; crontab -l
+# min hour day month weekday  command
+* * * * * /lab/jobs/backup.sh &gt;&gt; /tmp/backup.log 2&gt;&amp;1
+* * * * * env &gt; /tmp/cron-env.txt
+
+# Why it fails
+$ cat /tmp/backup.log
+/lab/jobs/backup.sh: 2: report-tool: not found
+saved report
+$ cat /tmp/cron-env.txt
+HOME=/root
+LOGNAME=root
+PATH=/usr/bin:/bin
+SHELL=/bin/sh
+PWD=/root
+$ ls /root
+report.txt
+
+# The fix: PATH and cd in the crontab
+$ cat fixed.cron
+PATH=/usr/local/bin:/usr/bin:/bin
+# min hour day month weekday  command
+* * * * * cd /lab/jobs &amp;&amp; ./backup.sh &gt;&gt; /tmp/backup.log 2&gt;&amp;1
+* * * * * echo "ran at $(date +%H:%M)" &gt;&gt; /tmp/broken.log
+* * * * * echo "ran at $(date +\%H:\%M)" &gt;&gt; /tmp/fixed.log
+$ crontab fixed.cron
+
+# Check it
+$ tail -n 1 /tmp/backup.log &amp;&amp; cat report.txt
+saved report
+report for demo: 42 orders
+
+# The percent-sign trap
+$ cat /tmp/broken.log
+cat: /tmp/broken.log: No such file or directory
+$ cat /tmp/fixed.log
+ran at 20:08</code></pre>
+    </section>
+    <section class="quiz" id="quiz">
+      <h2>Quick check</h2>
+      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "q": "My script works by hand, but in cron it says report-tool: not found. Why?", "opts": ["The script has no execute bit", "cron's PATH is only /usr/bin:/bin", "cron jobs must run as root"], "a": 1, "expl": "Set a path line at the top of the crontab, or call the program by its full path."}, {"type": "choice", "q": "What does a plain % sign do inside a crontab line?", "opts": ["Nothing, it is a normal character", "It starts a new line and cuts the command", "It comments out the rest of the line"], "a": 1, "expl": "Escape every percent sign with a backslash, or move the command into a script."}]</script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
+
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  var root=document.getElementById('quiz-root');
+  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
+  qs.forEach(function(q,i){
+    var box=document.createElement('div'); box.className='q';
+    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
+    var fb=document.createElement('p'); fb.className='fb';
+    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
+    if(q.type==='choice'){
+      var opts=document.createElement('div'); opts.className='opts';
+      q.opts.forEach(function(o,j){
+        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
+        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
+        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else {
+      var row=document.createElement('div'); row.className='row';
+      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
+      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
+      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
+      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
+      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
+    }
+    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>
