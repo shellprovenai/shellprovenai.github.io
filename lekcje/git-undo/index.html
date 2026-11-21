@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Undo anything in Git: restore vs reset vs revert (live demos) — ShellProven</title>
+<meta name="description" content="Five real &quot;undo&quot; situations in Git, each shown live: throw away an edit with git restore, unstage a file with git restore --staged, undo the last commit but keep the changes with git reset --soft, drop a commit with git reset --hard and get it back with git reflog, and safely undo a commit that&#x27;s already shared with git revert.">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Undo anything in Git: restore vs reset vs revert (live demos) — ShellProven">
+<meta property="og:description" content="Five real &quot;undo&quot; situations in Git, each shown live: throw away an edit with git restore, unstage a file with git restore --staged, undo the last commit but keep the changes with git reset --soft, drop a commit with git reset --hard and get it back with git reflog, and safely undo a commit that&#x27;s already shared with git revert.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/git-undo" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 03 · tested on Debian 13</span>
+    <h1>Undo anything in Git: restore vs reset vs revert (live demos)</h1>
+    <p class="sub">Five real &quot;undo&quot; situations in Git, each shown live: throw away an edit with git restore, unstage a file with git restore --staged, undo the last commit but keep the changes with git reset --soft, drop a commit with git reset --hard and get it back with git reflog, and safely undo a commit that&#x27;s already shared with git revert.</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <div class="two">
+    <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/git-undo">terminal-tutorials/git-undo</a>.</p>
+      <pre><code># The demo repository
+$ git log --oneline
+f1f7a48 Enable debug
+b01e5d3 Add currency
+52e0461 Add config
+
+# 1. Throw away an edit: git restore
+$ echo "price = 0" &gt;&gt; app.conf
+$ git status --short
+ M app.conf
+$ git restore app.conf
+$ cat app.conf
+price = 10
+currency = EUR
+debug = true
+
+# 2. Unstage a file: git restore --staged
+$ echo "tax = 23" &gt;&gt; app.conf &amp;&amp; git add app.conf &amp;&amp; git status --short
+M  app.conf
+$ git restore --staged app.conf &amp;&amp; git status --short
+ M app.conf
+$ git restore app.conf
+
+# 3. Undo the last commit, keep the changes: reset --soft
+$ git reset --soft HEAD~1
+$ git status --short &amp;&amp; git log --oneline
+M  app.conf
+b01e5d3 Add currency
+52e0461 Add config
+$ git commit -qm "Enable debug (only in dev)" &amp;&amp; git log --oneline
+4949205 Enable debug (only in dev)
+b01e5d3 Add currency
+52e0461 Add config
+
+# 4. Drop a commit with reset --hard, then get it back
+$ git reset --hard HEAD~1
+HEAD is now at b01e5d3 Add currency
+$ cat app.conf
+price = 10
+currency = EUR
+$ git reflog | head -3
+b01e5d3 HEAD@{0}: reset: moving to HEAD~1
+4949205 HEAD@{1}: commit: Enable debug (only in dev)
+b01e5d3 HEAD@{2}: reset: moving to HEAD~1
+$ git reset --hard "HEAD@{1}" &amp;&amp; git log --oneline
+HEAD is now at 4949205 Enable debug (only in dev)
+4949205 Enable debug (only in dev)
+b01e5d3 Add currency
+52e0461 Add config
+
+# 5. Undo a shared commit: git revert
+$ git revert --no-edit HEAD
+[main e8bee19] Revert "Enable debug (only in dev)"
+ Date: Sat Nov 21 19:07:10 2026 +0000
+ 1 file changed, 1 deletion(-)
+$ git log --oneline &amp;&amp; cat app.conf
+e8bee19 Revert "Enable debug (only in dev)"
+4949205 Enable debug (only in dev)
+b01e5d3 Add currency
+52e0461 Add config
+price = 10
+currency = EUR</code></pre>
+    </section>
+    <section class="quiz" id="quiz">
+      <h2>Quick check</h2>
+      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "q": "My bad commit is already pushed, and my team pulled it. Do I use reset or revert?", "opts": ["git reset --hard HEAD~1", "git revert HEAD", "git restore"], "a": 1, "expl": "Revert adds a new commit that undoes the change, so nobody's history breaks. Reset rewrites history."}, {"type": "choice", "q": "I ran git reset --hard and the commit vanished. Is it gone for good?", "opts": ["Yes, reset --hard deletes it at once", "No: git reflog still lists it, and you can reset back"], "a": 1, "expl": "Not right away. git reflog still lists it, and you can reset back to it."}]</script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
+
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  var root=document.getElementById('quiz-root');
+  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
+  qs.forEach(function(q,i){
+    var box=document.createElement('div'); box.className='q';
+    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
+    var fb=document.createElement('p'); fb.className='fb';
+    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
+    if(q.type==='choice'){
+      var opts=document.createElement('div'); opts.className='opts';
+      q.opts.forEach(function(o,j){
+        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
+        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
+        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else {
+      var row=document.createElement('div'); row.className='row';
+      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
+      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
+      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
+      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
+      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
+    }
+    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>
