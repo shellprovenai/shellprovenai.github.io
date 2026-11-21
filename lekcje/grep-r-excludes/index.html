@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search a whole project with grep -r, without node_modules, .git or binary junk — ShellProven</title>
+<meta name="description" content="Search a whole project for a string with grep -r, then cut the noise: skip node_modules, .git and build folders with --exclude-dir, ignore binary files with -I, search only one file type with --include, match whole words with -w, and stop dots from acting as wildcards with -F.">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Search a whole project with grep -r, without node_modules, .git or binary junk — ShellProven">
+<meta property="og:description" content="Search a whole project for a string with grep -r, then cut the noise: skip node_modules, .git and build folders with --exclude-dir, ignore binary files with -I, search only one file type with --include, match whole words with -w, and stop dots from acting as wildcards with -F.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/grep-r-excludes" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 02 · tested on Debian 13</span>
+    <h1>Search a whole project with grep -r, without node_modules, .git or binary junk</h1>
+    <p class="sub">Search a whole project for a string with grep -r, then cut the noise: skip node_modules, .git and build folders with --exclude-dir, ignore binary files with -I, search only one file type with --include, match whole words with -w, and stop dots from acting as wildcards with -F.</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <div class="two">
+    <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/grep-r-excludes">terminal-tutorials/grep-r-excludes</a>.</p>
+      <pre><code># The noisy first search
+$ grep -r "TODO" .
+./src/client.js:// TODO: handle errors
+./src/auth.py:    # TODO: rate limit
+./.git/config:	# TODO nothing
+./node_modules/left-pad/index.js:// TODO upstream bug
+./dist/app.min.js:function a(){/*TODO*/return 1}
+grep: ./bin/tool: binary file matches
+
+# Skip folders with --exclude-dir
+$ grep -rn "TODO" --exclude-dir=node_modules --exclude-dir=.git .
+./src/client.js:1:// TODO: handle errors
+./src/auth.py:2:    # TODO: rate limit
+./dist/app.min.js:1:function a(){/*TODO*/return 1}
+grep: ./bin/tool: binary file matches
+
+# Ignore binary files with -I
+$ grep -rnI "TODO" --exclude-dir={node_modules,.git,dist} .
+./src/client.js:1:// TODO: handle errors
+./src/auth.py:2:    # TODO: rate limit
+
+# Case, file types and file names
+$ grep -rniI "todo" --exclude-dir={node_modules,.git,dist} .
+./src/main.py:2:# todo: remove debug flag
+./src/client.js:1:// TODO: handle errors
+./src/auth.py:2:    # TODO: rate limit
+$ grep -rl "TODO" --include="*.py" .
+./src/auth.py
+
+# Whole words with -w
+$ grep -rn "log" logs src
+logs/app.log:1:2026 login ok
+logs/app.log:2:2026 user log out
+src/client.js:2:fetch("/api/catalog")
+src/auth.py:1:def login(user):
+$ grep -rnw "log" logs src
+logs/app.log:2:2026 user log out
+
+# Dots are wildcards: use -F
+$ grep -rn "1.5" src logs
+src/main.py:4:VERSION = "1.5"
+logs/app.log:3:version 105 started
+$ grep -rnF "1.5" src logs
+src/main.py:4:VERSION = "1.5"
+
+# Several patterns and some context
+$ grep -rnIE "TODO|FIXME|DEBUG" --exclude-dir={node_modules,.git,dist} .
+./src/main.py:3:DEBUG = True
+./src/client.js:1:// TODO: handle errors
+./src/auth.py:2:    # TODO: rate limit
+$ grep -n -A 1 "TODO" src/auth.py
+2:    # TODO: rate limit
+3-    return check(user)</code></pre>
+    </section>
+    <section class="quiz" id="quiz">
+      <h2>Quick check</h2>
+      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "q": "I search for version 1.5 and grep also matches 105. Which option fixes that?", "opts": ["-w", "-F", "-i"], "a": 1, "expl": "-F treats the pattern as plain text. Without it, the dot matches any character."}, {"type": "choice", "q": "I search for the word log and also get login and catalog. Which option keeps only whole words?", "opts": ["-w", "-F", "-l"], "a": 0, "expl": "-w accepts a match only when it is a word of its own."}]</script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
+
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  var root=document.getElementById('quiz-root');
+  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
+  qs.forEach(function(q,i){
+    var box=document.createElement('div'); box.className='q';
+    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
+    var fb=document.createElement('p'); fb.className='fb';
+    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
+    if(q.type==='choice'){
+      var opts=document.createElement('div'); opts.className='opts';
+      q.opts.forEach(function(o,j){
+        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
+        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
+        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else {
+      var row=document.createElement('div'); row.className='row';
+      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
+      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
+      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
+      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
+      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
+    }
+    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>
