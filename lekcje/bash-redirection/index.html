@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bash redirection explained: &gt;, &gt;&gt;, 2&gt;, 2&gt;&amp;1 and | (and why the order matters) — ShellProven</title>
+<meta name="description" content="Why do errors still show up on your screen after &quot;&gt; file&quot;? This video explains the two output streams, stdout and stderr, and shows live what &gt;, &gt;&gt;, 2&gt;, 2&gt;/dev/null, 2&gt;&amp;1, &amp;&gt; and | do, why &quot;2&gt;&amp;1 &gt; file&quot; doesn&#x27;t work, how to save output and still see it with tee, and how noclobber protects files from an accidental &gt;.">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Bash redirection explained: &gt;, &gt;&gt;, 2&gt;, 2&gt;&amp;1 and | (and why the order matters) — ShellProven">
+<meta property="og:description" content="Why do errors still show up on your screen after &quot;&gt; file&quot;? This video explains the two output streams, stdout and stderr, and shows live what &gt;, &gt;&gt;, 2&gt;, 2&gt;/dev/null, 2&gt;&amp;1, &amp;&gt; and | do, why &quot;2&gt;&amp;1 &gt; file&quot; doesn&#x27;t work, how to save output and still see it with tee, and how noclobber protects files from an accidental &gt;.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bash-redirection" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 06 · tested on Debian 13</span>
+    <h1>Bash redirection explained: &gt;, &gt;&gt;, 2&gt;, 2&gt;&amp;1 and | (and why the order matters)</h1>
+    <p class="sub">Why do errors still show up on your screen after &quot;&gt; file&quot;? This video explains the two output streams, stdout and stderr, and shows live what &gt;, &gt;&gt;, 2&gt;, 2&gt;/dev/null, 2&gt;&amp;1, &amp;&gt; and | do, why &quot;2&gt;&amp;1 &gt; file&quot; doesn&#x27;t work, how to save output and still see it with tee, and how noclobber protects files from an accidental &gt;.</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <div class="two">
+    <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bash-redirection">terminal-tutorials/bash-redirection</a>.</p>
+      <pre><code># Two output streams
+$ ls logs missing
+ls: cannot access 'missing': No such file or directory
+logs:
+a.log
+
+# &gt; sends stdout to a file
+$ ls logs missing &gt; out.txt
+ls: cannot access 'missing': No such file or directory
+$ cat out.txt
+logs:
+a.log
+
+# 2&gt; sends stderr to a file
+$ ls logs missing 2&gt; err.txt
+logs:
+a.log
+$ cat err.txt
+ls: cannot access 'missing': No such file or directory
+$ ls logs missing 2&gt;/dev/null
+logs:
+a.log
+
+# 2&gt;&amp;1: both streams into one file
+$ ls logs missing &gt; all.txt 2&gt;&amp;1
+$ cat all.txt
+ls: cannot access 'missing': No such file or directory
+logs:
+a.log
+$ ls logs missing 2&gt;&amp;1 &gt; wrong.txt
+ls: cannot access 'missing': No such file or directory
+$ cat wrong.txt
+logs:
+a.log
+
+# &gt; overwrites, &gt;&gt; appends
+$ echo first &gt; notes.txt &amp;&amp; echo second &gt; notes.txt &amp;&amp; cat notes.txt
+second
+$ echo third &gt;&gt; notes.txt &amp;&amp; cat notes.txt
+second
+third
+$ set -o noclobber &amp;&amp; echo oops &gt; notes.txt
+/tmp/.sp_seg.sh: line 8: notes.txt: cannot overwrite existing file
+$ set +o noclobber
+
+# Pipes only carry stdout
+$ ls logs missing | wc -l
+ls: cannot access 'missing': No such file or directory
+2
+$ ls logs missing 2&gt;&amp;1 | wc -l
+3
+
+# tee: save it and see it
+$ ls logs missing 2&gt;&amp;1 | tee run.log
+ls: cannot access 'missing': No such file or directory
+logs:
+a.log
+$ cat run.log
+ls: cannot access 'missing': No such file or directory
+logs:
+a.log</code></pre>
+    </section>
+    <section class="quiz" id="quiz">
+      <h2>Quick check</h2>
+      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "q": "I want stdout and stderr in one file. Is it cmd 2>&1 > all.txt or cmd > all.txt 2>&1?", "opts": ["cmd 2>&1 > all.txt", "cmd > all.txt 2>&1"], "a": 1, "expl": "Redirections run left to right. Point stream one at the file first, then copy stream two there."}, {"type": "choice", "q": "Which arrow adds to the end of a log file instead of wiping it: > or >>?", "opts": [">", ">>"], "a": 1, "expl": "Two arrows append. A single arrow replaces the whole file."}]</script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
+
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  var root=document.getElementById('quiz-root');
+  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
+  qs.forEach(function(q,i){
+    var box=document.createElement('div'); box.className='q';
+    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
+    var fb=document.createElement('p'); fb.className='fb';
+    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
+    if(q.type==='choice'){
+      var opts=document.createElement('div'); opts.className='opts';
+      q.opts.forEach(function(o,j){
+        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
+        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
+        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else {
+      var row=document.createElement('div'); row.className='row';
+      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
+      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
+      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
+      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
+      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
+    }
+    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>
