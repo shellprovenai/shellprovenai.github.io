@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SSH keys from scratch: generate, install, shortcut with ~/.ssh/config, turn off passwords — ShellProven</title>
+<meta name="description" content="Set up SSH key login from zero: generate an ed25519 key, see what ssh-copy-id actually does on the server, find out why a chmod 777 home folder silently breaks key login, create a short alias in ~/.ssh/config, and safely switch off password logins on the server (and check that it worked).">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="SSH keys from scratch: generate, install, shortcut with ~/.ssh/config, turn off passwords — ShellProven">
+<meta property="og:description" content="Set up SSH key login from zero: generate an ed25519 key, see what ssh-copy-id actually does on the server, find out why a chmod 777 home folder silently breaks key login, create a short alias in ~/.ssh/config, and safely switch off password logins on the server (and check that it worked).">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/ssh-keys" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 08 · tested on Debian 13</span>
+    <h1>SSH keys from scratch: generate, install, shortcut with ~/.ssh/config, turn off passwords</h1>
+    <p class="sub">Set up SSH key login from zero: generate an ed25519 key, see what ssh-copy-id actually does on the server, find out why a chmod 777 home folder silently breaks key login, create a short alias in ~/.ssh/config, and safely switch off password logins on the server (and check that it worked).</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <div class="two">
+    <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/ssh-keys">terminal-tutorials/ssh-keys</a>.</p>
+      <pre><code># 1. Generate a key
+$ ssh-keygen -t ed25519 -C "laptop" -f ~/.ssh/id_ed25519 -N ""
+Generating public/private ed25519 key pair.
+Your identification has been saved in /root/.ssh/id_ed25519
+Your public key has been saved in /root/.ssh/id_ed25519.pub
+The key fingerprint is:
+SHA256:yZJMUMO8ZslIf2trDS5G/fYiQl2u8TCJZGaxeYiAG5o laptop
+The key's randomart image is:
++--[ED25519 256]--+
+| .  .+o          |
+|o . ..+.         |
+|.+ o =.B         |
+|E   oo/oo..      |
+|     B+*S=       |
+|      +.@ .      |
+|     o o @       |
+|      + * *      |
+|     . + o o.    |
++----[SHA256]-----+
+$ ls -l ~/.ssh
+total 8
+-rw------- 1 root root 399 Nov 21 19:47 id_ed25519
+-rw-r--r-- 1 root root  88 Nov 21 19:47 id_ed25519.pub
+
+# 2. Install the public key on the server
+$ install -d -m 700 -o deploy -g deploy /home/deploy/.ssh &amp;&amp; install -m 600 -o deploy -g deploy ~/.ssh/id_ed25519.pub /home/deploy/.ssh/authorized_keys
+$ ssh -o StrictHostKeyChecking=accept-new deploy@localhost whoami
+Warning: Permanently added 'localhost' (ED25519) to the list of known hosts.
+deploy
+
+# 3. Why key login suddenly stops working
+$ chmod 777 /home/deploy &amp;&amp; ssh -o BatchMode=yes deploy@localhost whoami
+deploy@localhost: Permission denied (publickey,password).
+$ chmod 700 /home/deploy &amp;&amp; ssh -o BatchMode=yes deploy@localhost whoami
+deploy
+
+# 4. A shortcut in ~/.ssh/config
+$ printf 'Host web\n    HostName localhost\n    User deploy\n    IdentityFile ~/.ssh/id_ed25519\n' &gt; ~/.ssh/config &amp;&amp; chmod 600 ~/.ssh/config
+$ cat ~/.ssh/config
+Host web
+    HostName localhost
+    User deploy
+    IdentityFile ~/.ssh/id_ed25519
+$ ssh web 'whoami; hostname'
+deploy
+demo
+
+# 5. Turn off password logins
+$ sshd -T | grep -i '^passwordauthentication'
+passwordauthentication yes
+$ echo 'PasswordAuthentication no' &gt; /etc/ssh/sshd_config.d/10-no-passwords.conf &amp;&amp; sshd -t &amp;&amp; echo config OK
+config OK
+$ kill -HUP "$(cat /run/sshd.pid)" &amp;&amp; sleep 1 &amp;&amp; sshd -T | grep -i '^passwordauthentication'
+passwordauthentication no
+$ ssh -o PubkeyAuthentication=no -o BatchMode=yes deploy@localhost true
+deploy@localhost: Permission denied (publickey).
+$ ssh web 'echo key login still works'
+key login still works</code></pre>
+    </section>
+    <section class="quiz" id="quiz">
+      <h2>Quick check</h2>
+      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "q": "Which file do I give to the server: id_ed25519 or id_ed25519.pub?", "opts": ["id_ed25519", "id_ed25519.pub"], "a": 1, "expl": "The file without an extension is the private key. It never leaves your computer."}, {"type": "choice", "q": "Key login worked yesterday. After someone ran chmod 777 on the home folder, it says Permission denied. Why?", "opts": ["The key expired overnight", "sshd ignores keys that other users could change", "chmod 777 deleted the key"], "a": 1, "expl": "Home, dot s s h and authorized_keys must not be writable by others. Fix the permissions and the key works again."}]</script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
+
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  var root=document.getElementById('quiz-root');
+  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
+  qs.forEach(function(q,i){
+    var box=document.createElement('div'); box.className='q';
+    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
+    var fb=document.createElement('p'); fb.className='fb';
+    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
+    if(q.type==='choice'){
+      var opts=document.createElement('div'); opts.className='opts';
+      q.opts.forEach(function(o,j){
+        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
+        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
+        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else {
+      var row=document.createElement('div'); row.className='row';
+      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
+      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
+      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
+      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
+      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
+    }
+    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>
