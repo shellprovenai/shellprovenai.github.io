@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tar and gzip without the usual mistakes: back up a folder, skip the junk, verify the archive — ShellProven</title>
+<meta name="description" content="Back up a folder with tar and gzip the right way: create and list an archive, see why an absolute path ends up nested three folders deep when you extract it (and fix it with -C), skip node_modules and log files with --exclude, prove the archive matches the disk with tar --compare, and restore a single file.">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="tar and gzip without the usual mistakes: back up a folder, skip the junk, verify the archive — ShellProven">
+<meta property="og:description" content="Back up a folder with tar and gzip the right way: create and list an archive, see why an absolute path ends up nested three folders deep when you extract it (and fix it with -C), skip node_modules and log files with --exclude, prove the archive matches the disk with tar --compare, and restore a single file.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/tar-gzip-backup" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 11 · tested on Debian 13</span>
+    <h1>tar and gzip without the usual mistakes: back up a folder, skip the junk, verify the archive</h1>
+    <p class="sub">Back up a folder with tar and gzip the right way: create and list an archive, see why an absolute path ends up nested three folders deep when you extract it (and fix it with -C), skip node_modules and log files with --exclude, prove the archive matches the disk with tar --compare, and restore a single file.</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <div class="two">
+    <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/tar-gzip-backup">terminal-tutorials/tar-gzip-backup</a>.</p>
+      <pre><code># The project folder
+$ find project -type f | sort
+project/README.md
+project/logs/app.log
+project/node_modules/lib/bundle.bin
+project/src/app.py
+project/src/config.ini
+$ du -sh project
+8.1M	project
+
+# Create an archive and look inside
+$ tar -czf backup.tgz project
+$ ls -lh backup.tgz
+-rw-r--r-- 1 root root 8.1M Nov 21 20:16 backup.tgz
+$ tar -tzf backup.tgz
+project/
+project/src/
+project/src/app.py
+project/src/config.ini
+project/node_modules/
+project/node_modules/lib/
+project/node_modules/lib/bundle.bin
+project/logs/
+project/logs/app.log
+project/README.md
+
+# The trap: absolute paths
+$ tar -czf abs.tgz /lab/work/project
+tar: Removing leading `/' from member names
+$ tar -tzf abs.tgz | head -3
+lab/work/project/
+lab/work/project/src/
+lab/work/project/src/app.py
+$ mkdir /tmp/restore &amp;&amp; tar -xzf abs.tgz -C /tmp/restore &amp;&amp; find /tmp/restore -maxdepth 3 -type d
+/tmp/restore
+/tmp/restore/lab
+/tmp/restore/lab/work
+/tmp/restore/lab/work/project
+$ tar -czf good.tgz -C /lab/work project &amp;&amp; tar -tzf good.tgz | head -3
+project/
+project/src/
+project/src/app.py
+
+# Skip the junk with --exclude
+$ tar -czf small.tgz --exclude=node_modules --exclude='*.log' -C /lab/work project
+$ tar -tzf small.tgz
+project/
+project/src/
+project/src/app.py
+project/src/config.ini
+project/logs/
+project/README.md
+$ ls -lh good.tgz small.tgz
+-rw-r--r-- 1 root root 8.1M Nov 21 20:16 good.tgz
+-rw-r--r-- 1 root root  282 Nov 21 20:16 small.tgz
+
+# Verify the backup
+$ gzip -t small.tgz &amp;&amp; echo "gzip OK"
+gzip OK
+$ tar -dzf small.tgz -C /lab/work &amp;&amp; echo "archive matches the disk"
+archive matches the disk
+$ echo "debug = true" &gt; project/src/config.ini &amp;&amp; tar -dzf small.tgz -C /lab/work
+project/src/config.ini: Mod time differs
+project/src/config.ini: Size differs
+$ printf 'debug = false\n' &gt; project/src/config.ini &amp;&amp; tar -czf small.tgz --exclude=node_modules --exclude='*.log' -C /lab/work project
+
+# Restore one file
+$ mkdir /tmp/one &amp;&amp; tar -xzf small.tgz -C /tmp/one project/src/config.ini &amp;&amp; find /tmp/one -type f
+/tmp/one/project/src/config.ini</code></pre>
+    </section>
+    <section class="quiz" id="quiz">
+      <h2>Quick check</h2>
+      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "q": "I archived /lab/work/project by its full path and extracted it in /tmp/restore. Where are my files?", "opts": ["/tmp/restore/project", "/tmp/restore/lab/work/project", "Back in /lab/work/project"], "a": 1, "expl": "Tar keeps the whole path, minus the leading slash. Use -C with the parent folder to get short paths."}, {"type": "choice", "q": "How can I prove an archive still matches the files on disk?", "opts": ["gzip -t small.tgz", "tar -dzf small.tgz -C /lab/work", "ls -lh small.tgz"], "a": 1, "expl": "gzip -t only checks the compression. tar -d compares every file, and prints nothing when they match."}]</script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
+
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  var root=document.getElementById('quiz-root');
+  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
+  qs.forEach(function(q,i){
+    var box=document.createElement('div'); box.className='q';
+    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
+    var fb=document.createElement('p'); fb.className='fb';
+    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
+    if(q.type==='choice'){
+      var opts=document.createElement('div'); opts.className='opts';
+      q.opts.forEach(function(o,j){
+        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
+        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
+        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else {
+      var row=document.createElement('div'); row.className='row';
+      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
+      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
+      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
+      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
+      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
+    }
+    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>
