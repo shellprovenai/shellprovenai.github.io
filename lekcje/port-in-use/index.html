@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>&quot;Address already in use&quot;: find which process holds a port (ss, lsof, fuser) and free it — ShellProven</title>
+<meta name="description" content="Your app won&#x27;t start because the port is taken. Reproduce &quot;Address already in use&quot;, find the process that holds the port with ss -ltnp, lsof -i and fuser, stop it with a plain kill, and see the proof that fuser -k sends SIGKILL by default (exit status 137), so you can use -TERM instead.">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="&quot;Address already in use&quot;: find which process holds a port (ss, lsof, fuser) and free it — ShellProven">
+<meta property="og:description" content="Your app won&#x27;t start because the port is taken. Reproduce &quot;Address already in use&quot;, find the process that holds the port with ss -ltnp, lsof -i and fuser, stop it with a plain kill, and see the proof that fuser -k sends SIGKILL by default (exit status 137), so you can use -TERM instead.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/port-in-use" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 14 · tested on Debian 13</span>
+    <h1>&quot;Address already in use&quot;: find which process holds a port (ss, lsof, fuser) and free it</h1>
+    <p class="sub">Your app won&#x27;t start because the port is taken. Reproduce &quot;Address already in use&quot;, find the process that holds the port with ss -ltnp, lsof -i and fuser, stop it with a plain kill, and see the proof that fuser -k sends SIGKILL by default (exit status 137), so you can use -TERM instead.</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <div class="two">
+    <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/port-in-use">terminal-tutorials/port-in-use</a>.</p>
+      <pre><code># The error
+$ socat TCP-LISTEN:8080 -
+2026/11/21 21:31:49 socat[45] E bind(5, {AF=2 0.0.0.0:8080}, 16): Address already in use
+
+# ss: who is listening
+$ ss -ltnp
+State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess                       
+LISTEN 0      5            0.0.0.0:8080      0.0.0.0:*    users:(("socat",pid=43,fd=5))
+$ ss -ltnp 'sport = :8080'
+State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess                       
+LISTEN 0      5            0.0.0.0:8080      0.0.0.0:*    users:(("socat",pid=43,fd=5))
+
+# lsof and fuser
+$ lsof -i :8080
+COMMAND PID USER FD   TYPE  DEVICE SIZE/OFF NODE NAME
+socat    43 root 5u  IPv4 1034843      0t0  TCP *:8080 (LISTEN)
+$ fuser 8080/tcp
+8080/tcp:               43
+$ lsof -t -i :8080
+43
+
+# Free the port with kill
+$ kill $(lsof -t -i :8080); sleep 0.5; ss -ltn 'sport = :8080'
+State Recv-Q Send-Q Local Address:Port Peer Address:Port
+$ (setsid socat TCP-LISTEN:8080,fork SYSTEM:'echo hello' &gt;/dev/null 2&gt;&amp;1 &amp;); sleep 1; ss -ltnp 'sport = :8080'
+State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess                       
+LISTEN 0      5            0.0.0.0:8080      0.0.0.0:*    users:(("socat",pid=94,fd=5))
+
+# The trap: fuser -k sends SIGKILL
+$ kill $(lsof -t -i :8080); sleep 0.5; (setsid sh -c 'socat TCP-LISTEN:8080,fork SYSTEM:true &gt;/dev/null 2&gt;&amp;1; echo "exit status $?" &gt; /tmp/exit.txt' &amp;); sleep 1
+$ fuser -k 8080/tcp; sleep 1; cat /tmp/exit.txt
+8080/tcp:              114
+exit status 137
+$ (setsid sh -c 'socat TCP-LISTEN:8080,fork SYSTEM:true &gt;/dev/null 2&gt;&amp;1; echo "exit status $?" &gt; /tmp/exit.txt' &amp;); sleep 1; fuser -k -TERM 8080/tcp; sleep 1; cat /tmp/exit.txt
+8080/tcp:              121
+exit status 143</code></pre>
+    </section>
+    <section class="quiz" id="quiz">
+      <h2>Quick check</h2>
+      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "q": "Which command shows the process listening on port 8080?", "opts": ["ss -ltnp 'sport = :8080'", "ss -s", "ps aux | grep 8080"], "a": 0, "expl": "ss -ltnp lists listening TCP sockets with their process. Grepping ps for the number won't find a port."}, {"type": "choice", "q": "Which signal does fuser -k send by default?", "opts": ["SIGTERM", "SIGKILL (use fuser -k -TERM)", "SIGHUP"], "a": 1, "expl": "SIGKILL, exit status one three seven. Add -TERM to let the program shut down cleanly."}]</script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
+
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  var root=document.getElementById('quiz-root');
+  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
+  qs.forEach(function(q,i){
+    var box=document.createElement('div'); box.className='q';
+    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
+    var fb=document.createElement('p'); fb.className='fb';
+    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
+    if(q.type==='choice'){
+      var opts=document.createElement('div'); opts.className='opts';
+      q.opts.forEach(function(o,j){
+        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
+        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
+        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else {
+      var row=document.createElement('div'); row.className='row';
+      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
+      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
+      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
+      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
+      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
+    }
+    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>
