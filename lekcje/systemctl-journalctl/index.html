@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>systemctl and journalctl for people who only need five commands: status, logs, follow, enable — ShellProven</title>
+<meta name="description" content="The five systemd commands you actually need, on a real systemd running in a container: check a service with systemctl status, find out why a service failed with journalctl -u, read logs since boot or the last few minutes, follow logs live, and the start vs enable trap (enable --now does both).">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="systemctl and journalctl for people who only need five commands: status, logs, follow, enable — ShellProven">
+<meta property="og:description" content="The five systemd commands you actually need, on a real systemd running in a container: check a service with systemctl status, find out why a service failed with journalctl -u, read logs since boot or the last few minutes, follow logs live, and the start vs enable trap (enable --now does both).">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/systemctl-journalctl" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 15 · tested on Debian 13</span>
+    <h1>systemctl and journalctl for people who only need five commands: status, logs, follow, enable</h1>
+    <p class="sub">The five systemd commands you actually need, on a real systemd running in a container: check a service with systemctl status, find out why a service failed with journalctl -u, read logs since boot or the last few minutes, follow logs live, and the start vs enable trap (enable --now does both).</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <div class="two">
+    <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/systemctl-journalctl">terminal-tutorials/systemctl-journalctl</a>.</p>
+      <pre><code># 1. systemctl status
+$ systemctl start hello-app &amp;&amp; sleep 3 &amp;&amp; systemctl status hello-app --no-pager -n 2
+● hello-app.service - Hello demo app
+     Loaded: loaded (/etc/systemd/system/hello-app.service; disabled; preset: enabled)
+     Active: active (running) since Sat 2026-11-21 23:17:51 UTC; 3s ago
+ Invocation: 1aca39730eac412ea68f0819eba75cb9
+   Main PID: 108 (hello-app)
+      Tasks: 2 (limit: 307)
+     Memory: 404K (peak: 2M)
+        CPU: 10ms
+     CGroup: /system.slice/hello-app.service
+             ├─108 /bin/sh /usr/local/bin/hello-app
+             └─113 sleep 2
+
+Nov 21 23:17:51 demo hello-app[108]: tick 23:17:51
+Nov 21 23:17:53 demo hello-app[108]: tick 23:17:53
+
+# 2. Why did it fail? journalctl -u
+$ systemctl start report
+Job for report.service failed because the control process exited with error code.
+See "systemctl status report.service" and "journalctl -xeu report.service" for details.
+$ journalctl -u report --no-pager -n 5
+Nov 21 23:17:55 demo (ort-tool)[131]: report.service: Unable to locate executable '/usr/local/bin/report-tool': No such file or directory
+Nov 21 23:17:55 demo (ort-tool)[131]: report.service: Failed at step EXEC spawning /usr/local/bin/report-tool: No such file or directory
+Nov 21 23:17:55 demo systemd[1]: report.service: Main process exited, code=exited, status=203/EXEC
+Nov 21 23:17:55 demo systemd[1]: report.service: Failed with result 'exit-code'.
+Nov 21 23:17:55 demo systemd[1]: Failed to start report.service - Report job (broken on purpose).
+$ systemctl status report --no-pager
+× report.service - Report job (broken on purpose)
+     Loaded: loaded (/etc/systemd/system/report.service; static)
+     Active: failed (Result: exit-code) since Sat 2026-11-21 23:17:55 UTC; 14ms ago
+ Invocation: 7f7bc45d45024789a802d4210683dc86
+    Process: 131 ExecStart=/usr/local/bin/report-tool (code=exited, status=203/EXEC)
+   Main PID: 131 (code=exited, status=203/EXEC)
+   Mem peak: 1.7M
+        CPU: 6ms
+
+Nov 21 23:17:55 demo systemd[1]: Starting report.service - Report job (broken on purpose)...
+Nov 21 23:17:55 demo (ort-tool)[131]: report.service: Unable to locate executable '/usr/local/bin/report-tool': No such file or directory
+Nov 21 23:17:55 demo (ort-tool)[131]: report.service: Failed at step EXEC spawning /usr/local/bin/report-tool: No such file or directory
+Nov 21 23:17:55 demo systemd[1]: report.service: Main process exited, code=exited, status=203/EXEC
+Nov 21 23:17:55 demo systemd[1]: report.service: Failed with result 'exit-code'.
+Nov 21 23:17:55 demo systemd[1]: Failed to start report.service - Report job (broken on purpose).
+
+# 3. Logs since boot, or the last minutes
+$ journalctl -b -u hello-app --no-pager | head -4
+Nov 21 23:17:51 demo systemd[1]: Started hello-app.service - Hello demo app.
+Nov 21 23:17:51 demo hello-app[108]: hello-app starting
+Nov 21 23:17:51 demo hello-app[108]: tick 23:17:51
+Nov 21 23:17:53 demo hello-app[108]: tick 23:17:53
+$ journalctl --since "10 min ago" -p err --no-pager
+Nov 21 23:17:55 demo (ort-tool)[131]: report.service: Failed at step EXEC spawning /usr/local/bin/report-tool: No such file or directory
+Nov 21 23:17:55 demo systemd[1]: Failed to start report.service - Report job (broken on purpose).
+
+# 4. Follow logs live
+$ timeout 5 journalctl -u hello-app -f --no-pager -n 1
+Nov 21 23:17:57 demo hello-app[108]: tick 23:17:57
+Nov 21 23:17:59 demo hello-app[108]: tick 23:17:59
+Nov 21 23:18:01 demo hello-app[108]: tick 23:18:01
+Nov 21 23:18:03 demo hello-app[108]: tick 23:18:03
+
+# 5. start vs enable
+$ systemctl is-enabled hello-app
+disabled
+$ systemctl stop hello-app &amp;&amp; systemctl enable hello-app
+Created symlink '/etc/systemd/system/multi-user.target.wants/hello-app.service' → '/etc/systemd/system/hello-app.service'.
+$ systemctl is-active hello-app
+inactive
+$ systemctl enable --now hello-app &amp;&amp; systemctl is-active hello-app &amp;&amp; systemctl is-enabled hello-app
+active
+enabled</code></pre>
+    </section>
+    <section class="quiz" id="quiz">
+      <h2>Quick check</h2>
+      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "q": "I ran systemctl start myapp. Will it start again after a reboot?", "opts": ["Yes, start is permanent", "No. Use systemctl enable --now myapp", "Only if I run daemon-reload"], "a": 1, "expl": "Start means now, enable means at boot. enable --now does both."}, {"type": "choice", "q": "How do I see the logs of one service since the last boot?", "opts": ["journalctl -b -u myapp", "systemctl logs myapp", "journalctl -f"], "a": 0, "expl": "-b is the current boot, -u picks the unit. Add -f to follow it live."}]</script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
+
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  var root=document.getElementById('quiz-root');
+  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
+  qs.forEach(function(q,i){
+    var box=document.createElement('div'); box.className='q';
+    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
+    var fb=document.createElement('p'); fb.className='fb';
+    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
+    if(q.type==='choice'){
+      var opts=document.createElement('div'); opts.className='opts';
+      q.opts.forEach(function(o,j){
+        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
+        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
+        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else {
+      var row=document.createElement('div'); row.className='row';
+      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
+      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
+      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
+      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
+      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
+    }
+    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>
