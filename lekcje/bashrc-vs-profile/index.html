@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>.bashrc vs .profile vs .bash_profile: why your alias works in one terminal and not the other — ShellProven</title>
+<meta name="description" content="Why does an alias work in a new terminal tab but not over SSH? See exactly which startup file bash reads for login and interactive shells, reproduce the classic trap where creating ~/.bash_profile silently stops ~/.profile and ~/.bashrc from loading, fix it with one line, and learn where aliases and environment variables belong.">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content=".bashrc vs .profile vs .bash_profile: why your alias works in one terminal and not the other — ShellProven">
+<meta property="og:description" content="Why does an alias work in a new terminal tab but not over SSH? See exactly which startup file bash reads for login and interactive shells, reproduce the classic trap where creating ~/.bash_profile silently stops ~/.profile and ~/.bashrc from loading, fix it with one line, and learn where aliases and environment variables belong.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bashrc-vs-profile" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 16 · tested on Debian 13</span>
+    <h1>.bashrc vs .profile vs .bash_profile: why your alias works in one terminal and not the other</h1>
+    <p class="sub">Why does an alias work in a new terminal tab but not over SSH? See exactly which startup file bash reads for login and interactive shells, reproduce the classic trap where creating ~/.bash_profile silently stops ~/.profile and ~/.bashrc from loading, fix it with one line, and learn where aliases and environment variables belong.</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <div class="two">
+    <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bashrc-vs-profile">terminal-tutorials/bashrc-vs-profile</a>.</p>
+      <pre><code># The startup files
+$ ls -A /home/demo
+.bash_logout
+.bashrc
+.profile
+$ tail -n 1 /home/demo/.bashrc
+alias deploy='echo deploying the app'
+
+# Login shell vs interactive shell
+$ su demo -c "bash -l -c true"
+-&gt; reading ~/.profile
+-&gt; reading ~/.bashrc
+$ grep -A2 'BASH_VERSION' /home/demo/.profile
+if [ -n "$BASH_VERSION" ]; then
+    # include .bashrc if it exists
+    if [ -f "$HOME/.bashrc" ]; then
+$ su demo -c "bash -i -c true" 2&gt;/dev/null
+-&gt; reading ~/.bashrc
+$ su demo -c "bash -l -i -c 'type deploy'" 2&gt;/dev/null
+-&gt; reading ~/.profile
+-&gt; reading ~/.bashrc
+deploy is aliased to `echo deploying the app'
+
+# The trap: creating .bash_profile
+$ echo 'export PATH="$HOME/bin:$PATH"' &gt; /home/demo/.bash_profile
+$ su demo -c "bash -l -i -c 'type deploy || echo deploy is missing'" 2&gt;/dev/null
+deploy is missing
+$ su demo -c "bash -i -c 'type deploy'" 2&gt;/dev/null
+-&gt; reading ~/.bashrc
+deploy is aliased to `echo deploying the app'
+
+# The fix: one line
+$ echo '[ -f ~/.profile ] &amp;&amp; . ~/.profile' &gt;&gt; /home/demo/.bash_profile &amp;&amp; cat /home/demo/.bash_profile
+export PATH="$HOME/bin:$PATH"
+[ -f ~/.profile ] &amp;&amp; . ~/.profile
+$ su demo -c "bash -l -i -c 'type deploy'" 2&gt;/dev/null
+-&gt; reading ~/.profile
+-&gt; reading ~/.bashrc
+deploy is aliased to `echo deploying the app'</code></pre>
+    </section>
+    <section class="quiz" id="quiz">
+      <h2>Quick check</h2>
+      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "q": "I created ~/.bash_profile and now my aliases are gone over SSH. Why?", "opts": ["SSH never reads any startup file", "A login shell now reads ~/.bash_profile and skips ~/.profile, so ~/.bashrc never loads", "Aliases only work as root"], "a": 1, "expl": "Bash reads only the first of those files. Source dot profile from dot bash underscore profile to fix it."}, {"type": "choice", "q": "Where should an alias go so every new terminal tab has it?", "opts": ["~/.bashrc", "~/.bash_profile", "/etc/hostname"], "a": 0, "expl": "Interactive shells read dot bash r c. Keep environment variables in dot profile instead."}]</script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
+
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  var root=document.getElementById('quiz-root');
+  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
+  qs.forEach(function(q,i){
+    var box=document.createElement('div'); box.className='q';
+    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
+    var fb=document.createElement('p'); fb.className='fb';
+    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
+    if(q.type==='choice'){
+      var opts=document.createElement('div'); opts.className='opts';
+      q.opts.forEach(function(o,j){
+        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
+        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
+        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else {
+      var row=document.createElement('div'); row.className='row';
+      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
+      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
+      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
+      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
+      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
+    }
+    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>
