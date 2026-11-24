@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sed for the three things you actually need: replace in place, delete lines, print a range — ShellProven</title>
+<meta name="description" content="Learn the three sed jobs you need day to day: replace text (and why the g flag matters), edit a file in place safely with -i.bak and diff, delete comment and blank lines, and print a line range or the lines between two markers. Includes the trap where a careless /#/d deletes a line you wanted, with no backup to restore it.">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="sed for the three things you actually need: replace in place, delete lines, print a range — ShellProven">
+<meta property="og:description" content="Learn the three sed jobs you need day to day: replace text (and why the g flag matters), edit a file in place safely with -i.bak and diff, delete comment and blank lines, and print a line range or the lines between two markers. Includes the trap where a careless /#/d deletes a line you wanted, with no backup to restore it.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/sed-essentials" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 18 · tested on Debian 13</span>
+    <h1>sed for the three things you actually need: replace in place, delete lines, print a range</h1>
+    <p class="sub">Learn the three sed jobs you need day to day: replace text (and why the g flag matters), edit a file in place safely with -i.bak and diff, delete comment and blank lines, and print a line range or the lines between two markers. Includes the trap where a careless /#/d deletes a line you wanted, with no backup to restore it.</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <div class="two">
+    <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/sed-essentials">terminal-tutorials/sed-essentials</a>.</p>
+      <pre><code># Replace: s/old/new/
+$ cat app.conf
+# app settings
+host=localhost
+port=8080
+admin_port=8080
+
+# links
+url=http://localhost:8080/health?port=8080#start
+debug=true
+$ sed 's/8080/9090/' app.conf
+# app settings
+host=localhost
+port=9090
+admin_port=9090
+
+# links
+url=http://localhost:9090/health?port=8080#start
+debug=true
+$ sed 's/8080/9090/g' app.conf | grep 9090
+port=9090
+admin_port=9090
+url=http://localhost:9090/health?port=9090#start
+$ grep 8080 app.conf
+port=8080
+admin_port=8080
+url=http://localhost:8080/health?port=8080#start
+
+# Edit in place, with a backup
+$ sed -i.bak 's/^port=8080/port=9090/' app.conf
+$ diff app.conf.bak app.conf
+3c3
+&lt; port=8080
+---
+&gt; port=9090
+
+# The trap: -i without a backup
+$ sed -i '/#/d' app.conf &amp;&amp; cat app.conf
+host=localhost
+port=9090
+admin_port=8080
+
+debug=true
+$ cp app.conf.bak app.conf &amp;&amp; sed -i 's/^port=8080/port=9090/' app.conf
+$ sed '/^#/d' app.conf
+host=localhost
+port=9090
+admin_port=8080
+
+url=http://localhost:8080/health?port=8080#start
+debug=true
+
+# Delete lines
+$ sed '/^#/d; /^$/d' app.conf
+host=localhost
+port=9090
+admin_port=8080
+url=http://localhost:8080/health?port=8080#start
+debug=true
+$ sed '2d; $d' app.conf
+# app settings
+port=9090
+admin_port=8080
+
+# links
+url=http://localhost:8080/health?port=8080#start
+
+# Print a range
+$ sed -n '10,15p' app.log
+2026-11-20 10:00:10 INFO request 10
+2026-11-20 10:00:11 INFO request 11
+2026-11-20 10:00:12 ERROR request 12
+2026-11-20 10:00:13 INFO request 13
+2026-11-20 10:00:14 INFO request 14
+--- START deploy
+$ sed -n '/ERROR/p' app.log
+2026-11-20 10:00:12 ERROR request 12
+2026-11-20 10:00:21 ERROR request 21
+$ sed -n '/START/,/END/p' app.log
+--- START deploy
+2026-11-20 10:00:15 INFO request 15
+2026-11-20 10:00:16 INFO request 16
+--- END deploy
+$ echo "root=/var/www/html" | sed 's|/var/www|/srv/www|'
+root=/srv/www/html</code></pre>
+    </section>
+    <section class="quiz" id="quiz">
+      <h2>Quick check</h2>
+      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "q": "How do I edit a file in place with sed and keep a copy of the original?", "opts": ["sed -i 's/old/new/' file", "sed -i.bak 's/old/new/' file", "sed -n 's/old/new/' file"], "a": 1, "expl": "-i.bak saves the original first. Plain -i changes the file with no way back."}, {"type": "choice", "q": "Which command prints only lines 10 to 15 of app.log?", "opts": ["sed -n '10,15p' app.log", "sed '10,15p' app.log", "sed '10,15d' app.log"], "a": 0, "expl": "Without -n, sed prints every line, and the range twice."}]</script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
+
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  var root=document.getElementById('quiz-root');
+  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
+  qs.forEach(function(q,i){
+    var box=document.createElement('div'); box.className='q';
+    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
+    var fb=document.createElement('p'); fb.className='fb';
+    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
+    if(q.type==='choice'){
+      var opts=document.createElement('div'); opts.className='opts';
+      q.opts.forEach(function(o,j){
+        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
+        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
+        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
+      });
+      box.appendChild(opts);
+    } else {
+      var row=document.createElement('div'); row.className='row';
+      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
+      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
+      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
+      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
+      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
+    }
+    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>
