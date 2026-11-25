@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test yourself — ShellProven</title>
+<meta name="description" content="10 random questions from all ShellProven lessons, every answer checked in a real container. Get a grade and links to the parts worth another look.">
+<link rel="icon" href="../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="Test yourself — ShellProven">
+<meta property="og:description" content="10 random questions from all ShellProven lessons, with a grade at the end.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../"><img src="../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../lekcje/">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Test yourself</span>
+    <h1>10 random questions from all lessons</h1>
+    <p class="sub" id="pool-info">Every answer was checked by running the commands in a real container. Your first answer to each question counts; at the end you get a grade and links to the lessons worth another look. Your result is saved only in this browser — nothing is sent anywhere.</p>
+  </div>
+  <section class="quiz" id="quiz" style="max-width:46rem;padding-top:10px">
+    <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script src="../sp.js"></script>
+<script>
+(function () {
+  var root = document.getElementById('quiz-root'), pool = [];
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  // 10 questions, at most 2 from one lesson when the pool allows it
+  function pick() {
+    var per = {}, out = [], rest = [];
+    shuffle(pool.slice()).forEach(function (q) { if ((per[q.slug] || 0) < 2 && out.length < 10) { out.push(q); per[q.slug] = (per[q.slug] || 0) + 1; } else rest.push(q); });
+    while (out.length < 10 && rest.length) out.push(rest.shift());
+    return out;
+  }
+  function start() {
+    SP.quiz({ root: root, questions: pick(), id: '_quiz', retry: start, review: function (q) {
+      return [{ href: q.fromHref + (q.anchor ? '#' + q.anchor : ''), text: 'lesson ' + q.num + ': ' + q.ch }];
+    } });
+  }
+  if (!window.SP) return;
+  fetch('../lekcje/lekcje.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (j) {
+    var L = (j.lekcje || []).filter(function (l) { return l.pool; });
+    return Promise.all(L.map(function (l) {
+      return fetch('../lekcje/' + l.slug + '/quiz.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : []; }).then(function (qs) {
+        qs.forEach(function (q) { q.slug = l.slug; q.num = l.num; q.from = 'Lesson ' + l.num + ' · ' + l.title; q.fromHref = '../lekcje/' + l.slug + '/'; pool.push(q); });
+      }).catch(function () {});
+    })).then(function () {
+      document.getElementById('pool-info').insertAdjacentText('beforeend', ' Pool: ' + pool.length + ' questions from ' + L.length + (L.length === 1 ? ' lesson.' : ' lessons.'));
+      if (pool.length) start(); else root.textContent = 'No questions available right now.';
+    });
+  }).catch(function () { root.textContent = 'Could not load the questions. Please reload the page.'; });
+})();
+</script>
+</body>
+</html>
