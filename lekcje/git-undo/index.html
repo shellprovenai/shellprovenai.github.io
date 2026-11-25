@@ -16,7 +16,7 @@
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
-  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/git-undo" class="hide-s">Commands</a></nav>
+  <nav class="nav"><a href="../">All lessons</a><a href="../../quiz/">Test yourself</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/git-undo" class="hide-s">Commands</a></nav>
 </div></header>
 
 <main class="wrap">
@@ -30,17 +30,16 @@
     <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
   </div>
 
-  <div class="two">
-    <section>
+  <section>
       <h2>Commands</h2>
       <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/git-undo">terminal-tutorials/git-undo</a>.</p>
-      <pre><code># The demo repository
+      <pre class="cmds"><code><span class="ch" id="ch-2"># The demo repository</span>
 $ git log --oneline
 f1f7a48 Enable debug
 b01e5d3 Add currency
 52e0461 Add config
 
-# 1. Throw away an edit: git restore
+<span class="ch" id="ch-3"># 1. Throw away an edit: git restore</span>
 $ echo "price = 0" &gt;&gt; app.conf
 $ git status --short
  M app.conf
@@ -50,14 +49,14 @@ price = 10
 currency = EUR
 debug = true
 
-# 2. Unstage a file: git restore --staged
+<span class="ch" id="ch-4"># 2. Unstage a file: git restore --staged</span>
 $ echo "tax = 23" &gt;&gt; app.conf &amp;&amp; git add app.conf &amp;&amp; git status --short
 M  app.conf
 $ git restore --staged app.conf &amp;&amp; git status --short
  M app.conf
 $ git restore app.conf
 
-# 3. Undo the last commit, keep the changes: reset --soft
+<span class="ch" id="ch-5"># 3. Undo the last commit, keep the changes: reset --soft</span>
 $ git reset --soft HEAD~1
 $ git status --short &amp;&amp; git log --oneline
 M  app.conf
@@ -68,7 +67,7 @@ $ git commit -qm "Enable debug (only in dev)" &amp;&amp; git log --oneline
 b01e5d3 Add currency
 52e0461 Add config
 
-# 4. Drop a commit with reset --hard, then get it back
+<span class="ch" id="ch-6"># 4. Drop a commit with reset --hard, then get it back</span>
 $ git reset --hard HEAD~1
 HEAD is now at b01e5d3 Add currency
 $ cat app.conf
@@ -84,7 +83,7 @@ HEAD is now at 4949205 Enable debug (only in dev)
 b01e5d3 Add currency
 52e0461 Add config
 
-# 5. Undo a shared commit: git revert
+<span class="ch" id="ch-7"># 5. Undo a shared commit: git revert</span>
 $ git revert --no-edit HEAD
 [main e8bee19] Revert "Enable debug (only in dev)"
  Date: Sat Nov 21 19:07:10 2026 +0000
@@ -96,13 +95,32 @@ b01e5d3 Add currency
 52e0461 Add config
 price = 10
 currency = EUR</code></pre>
-    </section>
-    <section class="quiz" id="quiz">
-      <h2>Quick check</h2>
-      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
-      <div id="quiz-root"></div>
-    </section>
-  </div>
+  </section>
+  <section class="quiz" id="quiz">
+      <h2>Quiz</h2>
+      <p class="sub">10 questions: 2 from the video and 8 new ones. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+  <section id="practice">
+    <h2>Practice</h2>
+    <p class="sub">Do it yourself, without the video. Download the <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/git-undo/practice">practice folder</a> and run <code>sh start.sh</code> — it opens a throwaway container (podman or docker), nothing touches your system.</p>
+    <pre><code>PRACTICE — lesson 03: undo in Git
+---------------------------------
+/work/shop is your clone of a small shop website. The repository
+/work/origin.git is the shared server, and /work/mate is a teammate
+who already pulled everything. Right now in /work/shop you have:
+an uncommitted edit in notes.txt (keep it, don't commit it) and a
+file secrets.env that you staged with git add by mistake.
+
+1. Unstage secrets.env. Keep the file on disk, and don't commit it.
+2. The pushed commit "Raise mug price to 99" was a mistake. Undo it
+   so the mug costs 12 again, push the fix to origin, and make sure
+   your teammate can still simply pull. Your notes.txt edit must
+   survive.
+
+Check: sh /practice/check.sh     Answer: /practice/solution.md</code></pre>
+    <p class="sub">Inside, <code>sh check.sh</code> tells you when you are done. Stuck? <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/git-undo/practice/solution.md">solution.md</a> — but try first.</p>
+  </section>
 
   <section>
     <div class="note">
@@ -117,39 +135,22 @@ currency = EUR</code></pre>
   <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
 </div></footer>
 
-<script id="quiz-data" type="application/json">[{"type": "choice", "q": "My bad commit is already pushed, and my team pulled it. Do I use reset or revert?", "opts": ["git reset --hard HEAD~1", "git revert HEAD", "git restore"], "a": 1, "expl": "Revert adds a new commit that undoes the change, so nobody's history breaks. Reset rewrites history."}, {"type": "choice", "q": "I ran git reset --hard and the commit vanished. Is it gone for good?", "opts": ["Yes, reset --hard deletes it at once", "No: git reflog still lists it, and you can reset back"], "a": 1, "expl": "Not right away. git reflog still lists it, and you can reset back to it."}]</script>
+<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "My bad commit is already pushed, and my team pulled it. Do I use reset or revert?", "expl": "Revert adds a new commit that undoes the change, so nobody's history breaks. Reset rewrites history.", "ch": "5. Undo a shared commit: git revert", "anchor": "ch-7", "t": 197, "opts": ["git reset --hard HEAD~1", "git revert HEAD", "git restore"], "a": 1}, {"type": "choice", "kind": "video", "q": "I ran git reset --hard and the commit vanished. Is it gone for good?", "expl": "Not right away. `git reflog` still lists it, and you can reset back to it.", "ch": "4. Drop a commit with reset --hard, then get it back", "anchor": "ch-6", "t": 144, "opts": ["Yes, reset --hard deletes it at once", "No: git reflog still lists it, and you can reset back", "Only if it was never pushed"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "You added a bad line to `app.conf` and haven't committed. Type the `git restore` command that puts the file back to the last committed version.", "expl": "`git restore <file>` copies the last committed version over your edit. The status is clean again.", "ch": "1. Throw away an edit: git restore", "anchor": "ch-3", "t": 49, "answers": ["git restore app.conf", "git restore -- app.conf", "git restore ."]}, {"type": "cmd", "kind": "cmd", "q": "You ran `git add app.conf` too early. Type the `git restore` command that takes it out of the staging area but keeps your edit in the file.", "expl": "`--staged` only touches the staging area. Without it, restore works on the file itself.", "ch": "2. Unstage a file: git restore --staged", "anchor": "ch-4", "t": 79, "answers": ["git restore --staged app.conf", "git restore --staged -- app.conf", "git restore --staged ."]}, {"type": "choice", "kind": "trap", "q": "You ran `git restore app.conf` on an edit you never committed. Can git bring that edit back?", "expl": "Restore overwrites the file, and an edit that was never committed (or added) isn't stored anywhere in git.", "ch": "1. Throw away an edit: git restore", "anchor": "ch-3", "t": 49, "opts": ["Yes, with `git reflog`", "No: git never had a copy of it, so it's gone", "Yes, with `git restore --staged app.conf`"], "a": 1}, {"type": "choice", "kind": "output", "q": "In the demo repository (three commits, the last one “Enable debug” adds `debug = true`), what does this print? (`--format=%s` shows only the commit messages.)", "expl": "The commit is gone from the log, but its change stays in the file (and staged), ready to be committed again.", "ch": "3. Undo the last commit, keep the changes: reset --soft", "anchor": "ch-5", "t": 112, "opts": ["Add currency\\nAdd config\\ndebug = true", "Add currency\\nAdd config", "Enable debug\\nAdd currency\\nAdd config\\ndebug = true"], "a": 0, "show": "git reset --soft HEAD~1 && git log --format=%s && grep debug app.conf"}, {"type": "cmd", "kind": "cmd", "q": "Type the command that removes the last commit from the branch but keeps its changes staged, so you can commit them again.", "expl": "`--soft` only moves the branch back; the index and your files keep the changes. `HEAD~1`, `HEAD~` and `HEAD^` all mean the parent commit.", "ch": "3. Undo the last commit, keep the changes: reset --soft", "anchor": "ch-5", "t": 112, "answers": ["git reset --soft HEAD~1", "git reset --soft HEAD~", "git reset --soft HEAD^"]}, {"type": "choice", "kind": "trap", "q": "You have an uncommitted edit in `app.conf` and run `git reset --hard HEAD~1`. Later you reset back to `HEAD@{1}`. Is your edit back too?", "expl": "Reset --hard also wipes uncommitted changes, and git never stored them. Run `git status` before you use it.", "ch": "4. Drop a commit with reset --hard, then get it back", "anchor": "ch-6", "t": 144, "opts": ["Yes, reset --hard never touches uncommitted changes", "No: reflog brings back the commit, but the uncommitted edit is gone", "Yes, the edit is saved in the reflog together with the commit"], "a": 1}, {"type": "choice", "kind": "choice", "q": "What does `git revert HEAD` do?", "expl": "Nothing is deleted: the original commit stays, and a new “Revert …” commit undoes its change.", "ch": "5. Undo a shared commit: git revert", "anchor": "ch-7", "t": 197, "opts": ["Deletes the last commit from history", "Adds a new commit that does the opposite of the last one", "Moves the branch back one commit and keeps the changes staged"], "a": 1}, {"type": "choice", "kind": "choice", "q": "After `git restore --staged app.conf`, `git status --short` shows `M` in the second column. What does that mean?", "expl": "First column = staged, second column = changed in your working folder but not staged yet.", "ch": "2. Unstage a file: git restore --staged", "anchor": "ch-4", "t": 79, "opts": ["The change is staged and ready to commit", "The file is modified, but the change is not staged", "The file was merged from another branch"], "a": 1}]</script>
+<script src="../../sp.js"></script>
 <script>
 (function(){
   // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
   var v=document.getElementById('video'), id=v.getAttribute('data-yt');
-  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
-
+  function embed(t,play){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+(t!=null?'?start='+t+(play?'&autoplay=1':''):'')+'" title="Lesson video" allow="encrypted-media; picture-in-picture; autoplay" allowfullscreen loading="lazy"></iframe>'; }
+  if(id){ embed(); }
   var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
-  var root=document.getElementById('quiz-root');
-  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
-  qs.forEach(function(q,i){
-    var box=document.createElement('div'); box.className='q';
-    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
-    var fb=document.createElement('p'); fb.className='fb';
-    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
-    if(q.type==='choice'){
-      var opts=document.createElement('div'); opts.className='opts';
-      q.opts.forEach(function(o,j){
-        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
-        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
-        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
-      });
-      box.appendChild(opts);
-    } else {
-      var row=document.createElement('div'); row.className='row';
-      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
-      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
-      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
-      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
-      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
-    }
-    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
-  });
+  if(!window.SP||!qs.length) return;
+  SP.quiz({root:document.getElementById('quiz-root'), questions:qs, id:'git-undo', review:function(q){
+    var out=[];
+    if(id&&q.t!=null) out.push({href:'#video', text:'▶ video at '+SP.fmtT(q.t), onclick:function(e){ e.preventDefault(); embed(q.t,true); v.scrollIntoView({behavior:'smooth'}); }});
+    if(q.anchor) out.push({href:'#'+q.anchor, text:'commands: '+q.ch});
+    return out;
+  }});
 })();
 </script>
 </body>
