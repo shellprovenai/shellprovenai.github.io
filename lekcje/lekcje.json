@@ -87,9 +87,9 @@
    "slug": "awk-log-one-liners",
    "title": "awk for people who hate awk: 8 one-liners that answer real questions about a log",
    "youtube_id": "wpnCU4BFD3E",
-   "quiz": 2,
-   "pool": 0,
-   "practice": false
+   "quiz": 10,
+   "pool": 10,
+   "practice": true
   },
   {
    "num": "11",
@@ -116,7 +116,7 @@
    "youtube_id": "p-A9XZask4w",
    "quiz": 10,
    "pool": 10,
-   "practice": false
+   "practice": true
   },
   {
    "num": "14",
