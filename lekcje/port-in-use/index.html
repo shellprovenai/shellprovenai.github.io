@@ -16,7 +16,7 @@
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
-  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/port-in-use" class="hide-s">Commands</a></nav>
+  <nav class="nav"><a href="../">All lessons</a><a href="../../quiz/">Test yourself</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/port-in-use" class="hide-s">Commands</a></nav>
 </div></header>
 
 <main class="wrap">
@@ -26,19 +26,18 @@
     <p class="sub">Your app won&#x27;t start because the port is taken. Reproduce &quot;Address already in use&quot;, find the process that holds the port with ss -ltnp, lsof -i and fuser, stop it with a plain kill, and see the proof that fuser -k sends SIGKILL by default (exit status 137), so you can use -TERM instead.</p>
   </div>
 
-  <div class="video" id="video" data-yt="">
+  <div class="video" id="video" data-yt="srChWgDNCsU">
     <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
   </div>
 
-  <div class="two">
-    <section>
+  <section>
       <h2>Commands</h2>
       <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/port-in-use">terminal-tutorials/port-in-use</a>.</p>
-      <pre><code># The error
+      <pre class="cmds"><code><span class="ch" id="ch-2"># The error</span>
 $ socat TCP-LISTEN:8080 -
 2026/11/21 21:31:49 socat[45] E bind(5, {AF=2 0.0.0.0:8080}, 16): Address already in use
 
-# ss: who is listening
+<span class="ch" id="ch-3"># ss: who is listening</span>
 $ ss -ltnp
 State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess                       
 LISTEN 0      5            0.0.0.0:8080      0.0.0.0:*    users:(("socat",pid=43,fd=5))
@@ -46,7 +45,7 @@ $ ss -ltnp 'sport = :8080'
 State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess                       
 LISTEN 0      5            0.0.0.0:8080      0.0.0.0:*    users:(("socat",pid=43,fd=5))
 
-# lsof and fuser
+<span class="ch" id="ch-4"># lsof and fuser</span>
 $ lsof -i :8080
 COMMAND PID USER FD   TYPE  DEVICE SIZE/OFF NODE NAME
 socat    43 root 5u  IPv4 1034843      0t0  TCP *:8080 (LISTEN)
@@ -55,14 +54,14 @@ $ fuser 8080/tcp
 $ lsof -t -i :8080
 43
 
-# Free the port with kill
+<span class="ch" id="ch-5"># Free the port with kill</span>
 $ kill $(lsof -t -i :8080); sleep 0.5; ss -ltn 'sport = :8080'
 State Recv-Q Send-Q Local Address:Port Peer Address:Port
 $ (setsid socat TCP-LISTEN:8080,fork SYSTEM:'echo hello' &gt;/dev/null 2&gt;&amp;1 &amp;); sleep 1; ss -ltnp 'sport = :8080'
 State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess                       
 LISTEN 0      5            0.0.0.0:8080      0.0.0.0:*    users:(("socat",pid=94,fd=5))
 
-# The trap: fuser -k sends SIGKILL
+<span class="ch" id="ch-6"># The trap: fuser -k sends SIGKILL</span>
 $ kill $(lsof -t -i :8080); sleep 0.5; (setsid sh -c 'socat TCP-LISTEN:8080,fork SYSTEM:true &gt;/dev/null 2&gt;&amp;1; echo "exit status $?" &gt; /tmp/exit.txt' &amp;); sleep 1
 $ fuser -k 8080/tcp; sleep 1; cat /tmp/exit.txt
 8080/tcp:              114
@@ -70,13 +69,31 @@ exit status 137
 $ (setsid sh -c 'socat TCP-LISTEN:8080,fork SYSTEM:true &gt;/dev/null 2&gt;&amp;1; echo "exit status $?" &gt; /tmp/exit.txt' &amp;); sleep 1; fuser -k -TERM 8080/tcp; sleep 1; cat /tmp/exit.txt
 8080/tcp:              121
 exit status 143</code></pre>
-    </section>
-    <section class="quiz" id="quiz">
-      <h2>Quick check</h2>
-      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
-      <div id="quiz-root"></div>
-    </section>
-  </div>
+  </section>
+  <section class="quiz" id="quiz">
+      <h2>Quiz</h2>
+      <p class="sub">10 questions: 2 from the video and 8 new ones. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+  <section id="practice">
+    <h2>Practice</h2>
+    <p class="sub">Do it yourself, without the video. Download the <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/port-in-use/practice">practice folder</a> and run <code>sh start.sh</code> — it opens a throwaway container (podman or docker), nothing touches your system.</p>
+    <pre><code>PRACTICE — lesson 14: free a busy port
+--------------------------------------
+Your new app must listen on TCP port 5000, but it fails with
+"Address already in use". Three servers are running in this
+container, on ports 3000, 5000 and 5432. The ones on 3000 and 5432
+are needed and must keep running.
+
+1. Find the process that listens on port 5000 and write only its
+   PID (just the number) to /work/pid.txt.
+2. Stop that process so port 5000 is free. It saves its data when
+   it gets the polite SIGTERM, so it must not be killed harder
+   than that.
+
+Check: sh /practice/check.sh     Answer: /practice/solution.md</code></pre>
+    <p class="sub">Inside, <code>sh check.sh</code> tells you when you are done. Stuck? <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/port-in-use/practice/solution.md">solution.md</a> — but try first.</p>
+  </section>
 
   <section>
     <div class="note">
@@ -91,39 +108,22 @@ exit status 143</code></pre>
   <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
 </div></footer>
 
-<script id="quiz-data" type="application/json">[{"type": "choice", "q": "Which command shows the process listening on port 8080?", "opts": ["ss -ltnp 'sport = :8080'", "ss -s", "ps aux | grep 8080"], "a": 0, "expl": "ss -ltnp lists listening TCP sockets with their process. Grepping ps for the number won't find a port."}, {"type": "choice", "q": "Which signal does fuser -k send by default?", "opts": ["SIGTERM", "SIGKILL (use fuser -k -TERM)", "SIGHUP"], "a": 1, "expl": "SIGKILL, exit status one three seven. Add -TERM to let the program shut down cleanly."}]</script>
+<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "Which command shows the process listening on port 8080?", "expl": "`ss -ltnp` lists listening TCP sockets with the process that owns each one, and the filter keeps just port 8080. `ss -s` is only a summary, and `ps` knows nothing about ports.", "ch": "ss: who is listening", "anchor": "ch-3", "t": 54, "opts": ["ss -ltnp 'sport = :8080'", "ss -s", "ps aux | grep 8080"], "a": 0}, {"type": "choice", "kind": "video", "q": "Which signal does fuser -k send by default?", "expl": "SIGKILL, so the program ends with exit status 137 (128 + 9). Add `-TERM` and it gets the polite signal (143 = 128 + 15).", "ch": "The trap: fuser -k sends SIGKILL", "anchor": "ch-6", "t": 125, "opts": ["SIGTERM", "SIGKILL (use fuser -k -TERM)", "SIGHUP"], "a": 1}, {"type": "choice", "kind": "choice", "q": "In the demo, `socat TCP-LISTEN:8080 -` fails with “Address already in use”. Why?", "expl": "Only one program can listen on a given port and address at a time. On a free port the same command starts fine.", "ch": "The error", "anchor": "ch-2", "t": 28, "opts": ["Ports above 1024 need root", "Another process is already listening on port 8080", "socat can't listen on TCP ports"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "Two programs are listening (ports 8080 and 9000). Type the `ss` command that shows only the listening TCP socket on port 8080, with numbers and the process (use a `sport` filter).", "expl": "`-l` listening, `-t` TCP, `-n` numbers, `-p` process; the quoted filter keeps only the local port 8080. Without `-p` you see the port but not who owns it.", "ch": "ss: who is listening", "anchor": "ch-3", "t": 54, "answers": ["ss -ltnp 'sport = :8080'", "ss -tlnp 'sport = :8080'", "ss -ltnp sport = :8080", "ss -ltnp '( sport = :8080 )'"]}, {"type": "cmd", "kind": "cmd", "q": "Type the `lsof` command that prints only the PID of the process using port 8080, nothing else.", "expl": "`-t` (terse) prints just the PID, ready to pass to another command such as `kill`.", "ch": "lsof and fuser", "anchor": "ch-4", "t": 84, "answers": ["lsof -t -i :8080", "lsof -ti :8080", "lsof -i :8080 -t", "lsof -t -i:8080"]}, {"type": "choice", "kind": "choice", "q": "You run `ss -ltnp` as a normal user. The port is listed, but the process column is empty. Why?", "expl": "Without root, `-p` can't look inside other users' processes, so the column stays empty. The socket itself is still listed.", "ch": "ss: who is listening", "anchor": "ch-3", "t": 54, "opts": ["The process belongs to another user (e.g. root); run it with sudo", "`-n` hides process names", "The process has already exited"], "a": 0}, {"type": "cmd", "kind": "cmd", "q": "A server is listening on port 8086. Type one command that stops it with the polite SIGTERM, using `kill` and `lsof -t` to find the PID.", "expl": "Plain `kill` already sends SIGTERM (signal 15). `$(lsof -t -i :8086)` puts the PID in its place.", "ch": "Free the port with kill", "anchor": "ch-5", "t": 109, "answers": ["kill $(lsof -t -i :8086)", "kill $(lsof -ti :8086)", "kill -TERM $(lsof -t -i :8086)", "kill -15 $(lsof -t -i :8086)", "kill -s TERM $(lsof -t -i :8086)"]}, {"type": "choice", "kind": "output", "q": "A listener on port 8084 is stopped with a plain `kill`. What does this print?", "expl": "Only the header is left: nothing listens on 8084 anymore, so the port is free.", "ch": "Free the port with kill", "anchor": "ch-5", "t": 109, "opts": ["State Recv-Q Send-Q Local Address:Port Peer Address:Port", "State Recv-Q Send-Q Local Address:Port Peer Address:Port\\nLISTEN 0 5 0.0.0.0:8084 0.0.0.0:*", "bind: Address already in use"], "a": 0, "show": "kill $(lsof -t -i :8084); sleep 0.5; ss -ltn 'sport = :8084'"}, {"type": "choice", "kind": "trap", "q": "A guide tells you to free port 8082 with `fuser -k 8082/tcp`. How does the program on that port end?", "expl": "By default `fuser -k` sends SIGKILL, which can't be caught. Use `fuser -k -TERM 8082/tcp` to let it close properly.", "ch": "The trap: fuser -k sends SIGKILL", "anchor": "ch-6", "t": 125, "opts": ["It gets SIGTERM and can shut down cleanly", "It gets SIGKILL and has no chance to clean up (exit status 137)", "fuser only prints the PID, nothing is stopped"], "a": 1}, {"type": "choice", "kind": "choice", "q": "A process ended with exit status 143. Which signal stopped it?", "expl": "A shell reports 128 + the signal number: 143 − 128 = 15, SIGTERM. 137 would mean SIGKILL (9).", "ch": "The trap: fuser -k sends SIGKILL", "anchor": "ch-6", "t": 125, "opts": ["SIGKILL (9)", "SIGTERM (15)", "SIGHUP (1)"], "a": 1}]</script>
+<script src="../../sp.js"></script>
 <script>
 (function(){
   // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
   var v=document.getElementById('video'), id=v.getAttribute('data-yt');
-  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
-
+  function embed(t,play){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+(t!=null?'?start='+t+(play?'&autoplay=1':''):'')+'" title="Lesson video" allow="encrypted-media; picture-in-picture; autoplay" allowfullscreen loading="lazy"></iframe>'; }
+  if(id){ embed(); }
   var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
-  var root=document.getElementById('quiz-root');
-  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
-  qs.forEach(function(q,i){
-    var box=document.createElement('div'); box.className='q';
-    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
-    var fb=document.createElement('p'); fb.className='fb';
-    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
-    if(q.type==='choice'){
-      var opts=document.createElement('div'); opts.className='opts';
-      q.opts.forEach(function(o,j){
-        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
-        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
-        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
-      });
-      box.appendChild(opts);
-    } else {
-      var row=document.createElement('div'); row.className='row';
-      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
-      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
-      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
-      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
-      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
-    }
-    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
-  });
+  if(!window.SP||!qs.length) return;
+  SP.quiz({root:document.getElementById('quiz-root'), questions:qs, id:'port-in-use', review:function(q){
+    var out=[];
+    if(id&&q.t!=null) out.push({href:'#video', text:'▶ video at '+SP.fmtT(q.t), onclick:function(e){ e.preventDefault(); embed(q.t,true); v.scrollIntoView({behavior:'smooth'}); }});
+    if(q.anchor) out.push({href:'#'+q.anchor, text:'commands: '+q.ch});
+    return out;
+  }});
 })();
 </script>
 </body>
