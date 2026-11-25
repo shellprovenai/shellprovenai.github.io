@@ -16,7 +16,7 @@
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
-  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/grep-r-excludes" class="hide-s">Commands</a></nav>
+  <nav class="nav"><a href="../">All lessons</a><a href="../../quiz/">Test yourself</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/grep-r-excludes" class="hide-s">Commands</a></nav>
 </div></header>
 
 <main class="wrap">
@@ -30,11 +30,10 @@
     <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
   </div>
 
-  <div class="two">
-    <section>
+  <section>
       <h2>Commands</h2>
       <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/grep-r-excludes">terminal-tutorials/grep-r-excludes</a>.</p>
-      <pre><code># The noisy first search
+      <pre class="cmds"><code><span class="ch" id="ch-2"># The noisy first search</span>
 $ grep -r "TODO" .
 ./src/client.js:// TODO: handle errors
 ./src/auth.py:    # TODO: rate limit
@@ -43,19 +42,19 @@ $ grep -r "TODO" .
 ./dist/app.min.js:function a(){/*TODO*/return 1}
 grep: ./bin/tool: binary file matches
 
-# Skip folders with --exclude-dir
+<span class="ch" id="ch-3"># Skip folders with --exclude-dir</span>
 $ grep -rn "TODO" --exclude-dir=node_modules --exclude-dir=.git .
 ./src/client.js:1:// TODO: handle errors
 ./src/auth.py:2:    # TODO: rate limit
 ./dist/app.min.js:1:function a(){/*TODO*/return 1}
 grep: ./bin/tool: binary file matches
 
-# Ignore binary files with -I
+<span class="ch" id="ch-4"># Ignore binary files with -I</span>
 $ grep -rnI "TODO" --exclude-dir={node_modules,.git,dist} .
 ./src/client.js:1:// TODO: handle errors
 ./src/auth.py:2:    # TODO: rate limit
 
-# Case, file types and file names
+<span class="ch" id="ch-5"># Case, file types and file names</span>
 $ grep -rniI "todo" --exclude-dir={node_modules,.git,dist} .
 ./src/main.py:2:# todo: remove debug flag
 ./src/client.js:1:// TODO: handle errors
@@ -63,7 +62,7 @@ $ grep -rniI "todo" --exclude-dir={node_modules,.git,dist} .
 $ grep -rl "TODO" --include="*.py" .
 ./src/auth.py
 
-# Whole words with -w
+<span class="ch" id="ch-6"># Whole words with -w</span>
 $ grep -rn "log" logs src
 logs/app.log:1:2026 login ok
 logs/app.log:2:2026 user log out
@@ -72,14 +71,14 @@ src/auth.py:1:def login(user):
 $ grep -rnw "log" logs src
 logs/app.log:2:2026 user log out
 
-# Dots are wildcards: use -F
+<span class="ch" id="ch-7"># Dots are wildcards: use -F</span>
 $ grep -rn "1.5" src logs
 src/main.py:4:VERSION = "1.5"
 logs/app.log:3:version 105 started
 $ grep -rnF "1.5" src logs
 src/main.py:4:VERSION = "1.5"
 
-# Several patterns and some context
+<span class="ch" id="ch-8"># Several patterns and some context</span>
 $ grep -rnIE "TODO|FIXME|DEBUG" --exclude-dir={node_modules,.git,dist} .
 ./src/main.py:3:DEBUG = True
 ./src/client.js:1:// TODO: handle errors
@@ -87,13 +86,34 @@ $ grep -rnIE "TODO|FIXME|DEBUG" --exclude-dir={node_modules,.git,dist} .
 $ grep -n -A 1 "TODO" src/auth.py
 2:    # TODO: rate limit
 3-    return check(user)</code></pre>
-    </section>
-    <section class="quiz" id="quiz">
-      <h2>Quick check</h2>
-      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
-      <div id="quiz-root"></div>
-    </section>
-  </div>
+  </section>
+  <section class="quiz" id="quiz">
+      <h2>Quiz</h2>
+      <p class="sub">10 questions: 2 from the video and 8 new ones. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+  <section id="practice">
+    <h2>Practice</h2>
+    <p class="sub">Do it yourself, without the video. Download the <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/grep-r-excludes/practice">practice folder</a> and run <code>sh start.sh</code> — it opens a throwaway container (podman or docker), nothing touches your system.</p>
+    <pre><code>PRACTICE — lesson 02: grep -r without the noise
+-----------------------------------------------
+/work/shop is a small web shop project. Besides its own code it has
+node_modules (two of them, one is frontend/node_modules), .git, a
+build folder and a compiled binary in bin. Only the project's own
+text files count. Without changing anything inside /work/shop:
+
+1. Write every line that contains "fixme" in ANY case to
+   /work/fixme.txt, with file name and line number, like
+   ./app/server.js:1:// FIXME: close the db on exit
+   Skip node_modules, .git and build. Some notes are lowercase.
+2. Write the names of the files that contain the exact text
+   api.v2 to /work/files.txt, one per line, sorted, like
+   ./config/settings.ini   (same folders skipped, no binaries).
+   Careful: api_v2 and api-v2 are NOT the same text.
+
+Check: sh /practice/check.sh     Answer: /practice/solution.md</code></pre>
+    <p class="sub">Inside, <code>sh check.sh</code> tells you when you are done. Stuck? <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/grep-r-excludes/practice/solution.md">solution.md</a> — but try first.</p>
+  </section>
 
   <section>
     <div class="note">
@@ -108,39 +128,22 @@ $ grep -n -A 1 "TODO" src/auth.py
   <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
 </div></footer>
 
-<script id="quiz-data" type="application/json">[{"type": "choice", "q": "I search for version 1.5 and grep also matches 105. Which option fixes that?", "opts": ["-w", "-F", "-i"], "a": 1, "expl": "-F treats the pattern as plain text. Without it, the dot matches any character."}, {"type": "choice", "q": "I search for the word log and also get login and catalog. Which option keeps only whole words?", "opts": ["-w", "-F", "-l"], "a": 0, "expl": "-w accepts a match only when it is a word of its own."}]</script>
+<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "I search for version 1.5 and grep also matches 105. Which option fixes that?", "expl": "-F treats the pattern as plain text. Without it, the dot matches any character, so \"1.5\" also matches \"105\".", "ch": "Dots are wildcards: use -F", "anchor": "ch-7", "t": 174, "opts": ["-w", "-F", "-i"], "a": 1}, {"type": "choice", "kind": "video", "q": "I search for the word log and also get login and catalog. Which option keeps only whole words?", "expl": "-w accepts a match only when it is a word of its own, so login and catalog are dropped.", "ch": "Whole words with -w", "anchor": "ch-6", "t": 154, "opts": ["-w", "-F", "-l"], "a": 0}, {"type": "cmd", "kind": "cmd", "q": "Type a recursive grep for `TODO` in the current folder, with line numbers, that skips the `node_modules` and `.git` folders.", "expl": "--exclude-dir takes a folder name and can be repeated. Plain --exclude is for file names, so it doesn't skip folders.", "ch": "Skip folders with --exclude-dir", "anchor": "ch-3", "t": 60, "answers": ["grep -rn \"TODO\" --exclude-dir=node_modules --exclude-dir=.git .", "grep -rn TODO --exclude-dir=node_modules --exclude-dir=.git .", "grep -rn \"TODO\" --exclude-dir=.git --exclude-dir=node_modules .", "grep -rn --exclude-dir=node_modules --exclude-dir=.git \"TODO\" .", "grep -nr \"TODO\" --exclude-dir=node_modules --exclude-dir=.git .", "grep -rn \"TODO\" --exclude-dir={node_modules,.git} ."]}, {"type": "choice", "kind": "choice", "q": "What does `--exclude-dir=node_modules` skip?", "expl": "You give a folder name, not a path, so grep skips node_modules wherever it is, for example web/node_modules too.", "ch": "Skip folders with --exclude-dir", "anchor": "ch-3", "t": 60, "opts": ["Only ./node_modules at the top of the project", "Every folder named node_modules, at any depth", "Files named node_modules, but not folders"], "a": 1}, {"type": "choice", "kind": "output", "q": "What does this print in the demo project? (dist/app.min.js has a TODO, bin/tool is a binary file with TODO in it.)", "expl": "-I skips the binary bin/tool, but dist was not excluded this time, so the minified file is still listed.", "ch": "Ignore binary files with -I", "anchor": "ch-4", "t": 83, "opts": ["./src/auth.py\\n./src/client.js", "./dist/app.min.js\\n./src/auth.py\\n./src/client.js", "./bin/tool\\n./dist/app.min.js\\n./src/auth.py\\n./src/client.js"], "a": 1, "show": "grep -rlI \"TODO\" --exclude-dir={node_modules,.git} . | sort"}, {"type": "choice", "kind": "trap", "q": "A script that runs under plain `sh` contains `grep -rnI TODO --exclude-dir={node_modules,.git,dist} .` What happens?", "expl": "The {a,b,c} trick is a bash feature. Plain sh passes it to grep as one odd folder name, so write the options out one by one.", "ch": "Ignore binary files with -I", "anchor": "ch-4", "t": 83, "opts": ["The same two lines as in bash", "The braces are not expanded, so none of the three folders is skipped", "sh stops with a syntax error"], "a": 1}, {"type": "choice", "kind": "choice", "q": "`grep -rnI \"TODO\" --exclude-dir={node_modules,.git,dist} .` prints two lines. Why can it still miss a to-do?", "expl": "grep matches case exactly by default. In the demo, the lowercase to-do in src/main.py only shows up with -i.", "ch": "Case, file types and file names", "anchor": "ch-5", "t": 118, "opts": ["-I hides text files that are too long", "The search is case-sensitive, so a lowercase `# todo:` is skipped; add `-i`", "grep stops after the first match in each folder"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "Type a command that prints only the names of the `.py` files under the current folder that contain `todo` in any case (TODO, todo, ...).", "expl": "-i ignores case, -l prints just file names, and --include=\"*.py\" limits the search to Python files.", "ch": "Case, file types and file names", "anchor": "ch-5", "t": 118, "answers": ["grep -rli \"todo\" --include=\"*.py\" .", "grep -ril \"todo\" --include=\"*.py\" .", "grep -rli \"TODO\" --include=\"*.py\" .", "grep -rli todo --include='*.py' .", "grep -rli --include=\"*.py\" \"todo\" ."]}, {"type": "choice", "kind": "choice", "q": "Which command finds lines with `TODO`, `FIXME` or `DEBUG` in one search?", "expl": "-E turns on extended patterns, where the vertical bar means \"or\". Without -E, the bar is just a character to find.", "ch": "Several patterns and some context", "anchor": "ch-8", "t": 196, "opts": ["`grep -rnE \"TODO|FIXME|DEBUG\" src`", "`grep -rn \"TODO|FIXME|DEBUG\" src`", "`grep -rnw \"TODO FIXME DEBUG\" src`"], "a": 0}, {"type": "cmd", "kind": "cmd", "q": "Type a command that shows the `TODO` line in `src/auth.py`, with its line number and the one line after it.", "expl": "-A 1 adds one line After the match. -B shows lines Before it, and -C both.", "ch": "Several patterns and some context", "anchor": "ch-8", "t": 196, "answers": ["grep -n -A 1 \"TODO\" src/auth.py", "grep -n -A1 \"TODO\" src/auth.py", "grep -nA1 TODO src/auth.py", "grep -A 1 -n \"TODO\" src/auth.py"]}]</script>
+<script src="../../sp.js"></script>
 <script>
 (function(){
   // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
   var v=document.getElementById('video'), id=v.getAttribute('data-yt');
-  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
-
+  function embed(t,play){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+(t!=null?'?start='+t+(play?'&autoplay=1':''):'')+'" title="Lesson video" allow="encrypted-media; picture-in-picture; autoplay" allowfullscreen loading="lazy"></iframe>'; }
+  if(id){ embed(); }
   var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
-  var root=document.getElementById('quiz-root');
-  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
-  qs.forEach(function(q,i){
-    var box=document.createElement('div'); box.className='q';
-    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
-    var fb=document.createElement('p'); fb.className='fb';
-    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
-    if(q.type==='choice'){
-      var opts=document.createElement('div'); opts.className='opts';
-      q.opts.forEach(function(o,j){
-        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
-        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
-        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
-      });
-      box.appendChild(opts);
-    } else {
-      var row=document.createElement('div'); row.className='row';
-      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
-      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
-      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
-      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
-      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
-    }
-    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
-  });
+  if(!window.SP||!qs.length) return;
+  SP.quiz({root:document.getElementById('quiz-root'), questions:qs, id:'grep-r-excludes', review:function(q){
+    var out=[];
+    if(id&&q.t!=null) out.push({href:'#video', text:'▶ video at '+SP.fmtT(q.t), onclick:function(e){ e.preventDefault(); embed(q.t,true); v.scrollIntoView({behavior:'smooth'}); }});
+    if(q.anchor) out.push({href:'#'+q.anchor, text:'commands: '+q.ch});
+    return out;
+  }});
 })();
 </script>
 </body>
