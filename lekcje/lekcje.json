@@ -1,15 +1,167 @@
 {
-  "_opis": "Źródło prawdy dla slugów lekcji: katalog TOR-A → slug URL (lekcje/<slug>/ i terminal-tutorials/<slug>/). Pola youtube_id uzupełnia zarządca po uploadzie; index.html i lekcje/index.html mają być z tym zgodne.",
-  "lekcje": [
-    {"num":"01","katalog":"01-find-zmienione-24h","slug":"find-changed-24h","title":"Find files changed in the last 24 hours (and the -mtime +1 trap)","youtube_id":""},
-    {"num":"02","katalog":"02-grep-r-wykluczenia","slug":"grep-r-excludes","title":"Search a whole project with grep -r, without node_modules, .git or binary junk","youtube_id":""},
-    {"num":"03","katalog":"03-git-cofanie","slug":"git-undo","title":"Undo anything in Git: restore vs reset vs revert (live demos)","youtube_id":""},
-    {"num":"04","katalog":"04-uprawnienia-chmod","slug":"chmod-permissions","title":"Linux file permissions: read ls -l, fix \"Permission denied\", and never chmod 777","youtube_id":""},
-    {"num":"05","katalog":"05-sqlite-csv","slug":"sqlite-csv","title":"SQLite in the terminal: query a CSV file in 5 minutes (and the text-number trap)","youtube_id":""},
-    {"num":"06","katalog":"06-przekierowania","slug":"bash-redirection","title":"Bash redirection explained: >, >>, 2>, 2>&1 and | (and why the order matters)","youtube_id":""},
-    {"num":"07","katalog":"07-du-df-dysk","slug":"disk-space-df-du","title":"Disk full? Find what's eating your space with df, du and sort (Linux)","youtube_id":""},
-    {"num":"08","katalog":"08-ssh-klucze","slug":"ssh-keys","title":"SSH keys from scratch: generate, install, shortcut with ~/.ssh/config, turn off passwords","youtube_id":""},
-    {"num":"09","katalog":"09-cron-nie-dziala","slug":"cron-not-running","title":"Cron job not running? It works in the terminal, here's why it fails in cron","youtube_id":""},
-    {"num":"10","katalog":"10-awk-logi","slug":"awk-log-one-liners","title":"awk for people who hate awk: 8 one-liners that answer real questions about a log","youtube_id":""}
-  ]
+ "_about": "Published ShellProven lessons (generated). One source for the lesson list progress bar, lesson quizzes and /quiz/.",
+ "lekcje": [
+  {
+   "num": "01",
+   "slug": "find-changed-24h",
+   "title": "Find files changed in the last 24 hours (and the -mtime +1 trap)",
+   "youtube_id": "lIVTi5okxE4",
+   "quiz": 10,
+   "pool": 10,
+   "practice": true
+  },
+  {
+   "num": "02",
+   "slug": "grep-r-excludes",
+   "title": "Search a whole project with grep -r, without node_modules, .git or binary junk",
+   "youtube_id": "tD4MQAwHvGE",
+   "quiz": 10,
+   "pool": 10,
+   "practice": true
+  },
+  {
+   "num": "03",
+   "slug": "git-undo",
+   "title": "Undo anything in Git: restore vs reset vs revert (live demos)",
+   "youtube_id": "5c9BuKeq5Sk",
+   "quiz": 10,
+   "pool": 10,
+   "practice": true
+  },
+  {
+   "num": "04",
+   "slug": "chmod-permissions",
+   "title": "Linux file permissions: read ls -l, fix \"Permission denied\", and never chmod 777",
+   "youtube_id": "oUAslKIrS1k",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "05",
+   "slug": "sqlite-csv",
+   "title": "SQLite in the terminal: query a CSV file in 5 minutes (and the text-number trap)",
+   "youtube_id": "HDbG6iW3WRM",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "06",
+   "slug": "bash-redirection",
+   "title": "Bash redirection explained: >, >>, 2>, 2>&1 and | (and why the order matters)",
+   "youtube_id": "2bKrAD4Gl4E",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "07",
+   "slug": "disk-space-df-du",
+   "title": "Disk full? Find what's eating your space with df, du and sort (Linux)",
+   "youtube_id": "ZjuJPfSrLok",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "08",
+   "slug": "ssh-keys",
+   "title": "SSH keys from scratch: generate, install, shortcut with ~/.ssh/config, turn off passwords",
+   "youtube_id": "Ng6o-q27tVE",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "09",
+   "slug": "cron-not-running",
+   "title": "Cron job not running? It works in the terminal, here's why it fails in cron",
+   "youtube_id": "c2R8fSO_8Uo",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "10",
+   "slug": "awk-log-one-liners",
+   "title": "awk for people who hate awk: 8 one-liners that answer real questions about a log",
+   "youtube_id": "wpnCU4BFD3E",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "11",
+   "slug": "tar-gzip-backup",
+   "title": "tar and gzip without the usual mistakes: back up a folder, skip the junk, verify the archive",
+   "youtube_id": "qmOhkBLBX7k",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "12",
+   "slug": "rsync-instead-of-cp",
+   "title": "rsync instead of cp: copy only what changed, dry-run first, and the trailing-slash trap",
+   "youtube_id": "3YrSm6wADKw",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "13",
+   "slug": "ps-top-kill",
+   "title": "What's eating your CPU? Find it with ps and top, and stop it safely (SIGTERM vs SIGKILL)",
+   "youtube_id": "p-A9XZask4w",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "14",
+   "slug": "port-in-use",
+   "title": "\"Address already in use\": find which process holds a port (ss, lsof, fuser) and free it",
+   "youtube_id": "srChWgDNCsU",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "15",
+   "slug": "systemctl-journalctl",
+   "title": "systemctl and journalctl for people who only need five commands: status, logs, follow, enable",
+   "youtube_id": "5yBAu13oXLg",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "16",
+   "slug": "bashrc-vs-profile",
+   "title": ".bashrc vs .profile vs .bash_profile: why your alias works in one terminal and not the other",
+   "youtube_id": "MIiZMT6JqLU",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "17",
+   "slug": "xargs-find-exec",
+   "title": "xargs and find -exec done right: spaces in file names, -print0, and parallel jobs",
+   "youtube_id": "",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "18",
+   "slug": "sed-essentials",
+   "title": "sed for the three things you actually need: replace in place, delete lines, print a range",
+   "youtube_id": "",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  }
+ ]
 }
