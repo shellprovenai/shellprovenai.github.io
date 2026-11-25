@@ -16,7 +16,7 @@
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
-  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bashrc-vs-profile" class="hide-s">Commands</a></nav>
+  <nav class="nav"><a href="../">All lessons</a><a href="../../quiz/">Test yourself</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bashrc-vs-profile" class="hide-s">Commands</a></nav>
 </div></header>
 
 <main class="wrap">
@@ -26,15 +26,14 @@
     <p class="sub">Why does an alias work in a new terminal tab but not over SSH? See exactly which startup file bash reads for login and interactive shells, reproduce the classic trap where creating ~/.bash_profile silently stops ~/.profile and ~/.bashrc from loading, fix it with one line, and learn where aliases and environment variables belong.</p>
   </div>
 
-  <div class="video" id="video" data-yt="">
+  <div class="video" id="video" data-yt="MIiZMT6JqLU">
     <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
   </div>
 
-  <div class="two">
-    <section>
+  <section>
       <h2>Commands</h2>
       <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bashrc-vs-profile">terminal-tutorials/bashrc-vs-profile</a>.</p>
-      <pre><code># The startup files
+      <pre class="cmds"><code><span class="ch" id="ch-2"># The startup files</span>
 $ ls -A /home/demo
 .bash_logout
 .bashrc
@@ -42,7 +41,7 @@ $ ls -A /home/demo
 $ tail -n 1 /home/demo/.bashrc
 alias deploy='echo deploying the app'
 
-# Login shell vs interactive shell
+<span class="ch" id="ch-3"># Login shell vs interactive shell</span>
 $ su demo -c "bash -l -c true"
 -&gt; reading ~/.profile
 -&gt; reading ~/.bashrc
@@ -57,7 +56,7 @@ $ su demo -c "bash -l -i -c 'type deploy'" 2&gt;/dev/null
 -&gt; reading ~/.bashrc
 deploy is aliased to `echo deploying the app'
 
-# The trap: creating .bash_profile
+<span class="ch" id="ch-4"># The trap: creating .bash_profile</span>
 $ echo 'export PATH="$HOME/bin:$PATH"' &gt; /home/demo/.bash_profile
 $ su demo -c "bash -l -i -c 'type deploy || echo deploy is missing'" 2&gt;/dev/null
 deploy is missing
@@ -65,7 +64,7 @@ $ su demo -c "bash -i -c 'type deploy'" 2&gt;/dev/null
 -&gt; reading ~/.bashrc
 deploy is aliased to `echo deploying the app'
 
-# The fix: one line
+<span class="ch" id="ch-5"># The fix: one line</span>
 $ echo '[ -f ~/.profile ] &amp;&amp; . ~/.profile' &gt;&gt; /home/demo/.bash_profile &amp;&amp; cat /home/demo/.bash_profile
 export PATH="$HOME/bin:$PATH"
 [ -f ~/.profile ] &amp;&amp; . ~/.profile
@@ -73,13 +72,32 @@ $ su demo -c "bash -l -i -c 'type deploy'" 2&gt;/dev/null
 -&gt; reading ~/.profile
 -&gt; reading ~/.bashrc
 deploy is aliased to `echo deploying the app'</code></pre>
-    </section>
-    <section class="quiz" id="quiz">
-      <h2>Quick check</h2>
-      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
-      <div id="quiz-root"></div>
-    </section>
-  </div>
+  </section>
+  <section class="quiz" id="quiz">
+      <h2>Quiz</h2>
+      <p class="sub">10 questions: 2 from the video and 8 new ones. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+  <section id="practice">
+    <h2>Practice</h2>
+    <p class="sub">Do it yourself, without the video. Download the <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bashrc-vs-profile/practice">practice folder</a> and run <code>sh start.sh</code> — it opens a throwaway container (podman or docker), nothing touches your system.</p>
+    <pre><code>PRACTICE — lesson 16: .bashrc vs .profile vs .bash_profile
+----------------------------------------------------------
+/work/home is the home folder of a developer. Their aliases (ll,
+gs) work in every new terminal tab, but over SSH they are gone.
+You can try both kinds of shell with that home folder:
+  new terminal tab:  HOME=/work/home bash -i -c 'alias'
+  SSH login shell:   HOME=/work/home bash -l -i -c 'alias'
+
+1. Add the alias  logs='tail -n 20 app.log'  so that every new
+   terminal tab (interactive, non-login shell) has it.
+2. Make login shells get all the aliases too. Keep .bash_profile
+   and what it sets (PATH with ~/bin, EDITOR); don't copy the
+   aliases into more than one file.
+
+Check: sh /practice/check.sh     Answer: /practice/solution.md</code></pre>
+    <p class="sub">Inside, <code>sh check.sh</code> tells you when you are done. Stuck? <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bashrc-vs-profile/practice/solution.md">solution.md</a> — but try first.</p>
+  </section>
 
   <section>
     <div class="note">
@@ -94,39 +112,22 @@ deploy is aliased to `echo deploying the app'</code></pre>
   <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
 </div></footer>
 
-<script id="quiz-data" type="application/json">[{"type": "choice", "q": "I created ~/.bash_profile and now my aliases are gone over SSH. Why?", "opts": ["SSH never reads any startup file", "A login shell now reads ~/.bash_profile and skips ~/.profile, so ~/.bashrc never loads", "Aliases only work as root"], "a": 1, "expl": "Bash reads only the first of those files. Source dot profile from dot bash underscore profile to fix it."}, {"type": "choice", "q": "Where should an alias go so every new terminal tab has it?", "opts": ["~/.bashrc", "~/.bash_profile", "/etc/hostname"], "a": 0, "expl": "Interactive shells read dot bash r c. Keep environment variables in dot profile instead."}]</script>
+<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "I created ~/.bash_profile and now my aliases are gone over SSH. Why?", "expl": "Bash reads only the first of `~/.bash_profile`, `~/.bash_login`, `~/.profile`. Source `~/.profile` from `~/.bash_profile` to fix it.", "ch": "The trap: creating .bash_profile", "anchor": "ch-4", "t": 100, "opts": ["SSH never reads any startup file", "A login shell now reads ~/.bash_profile and skips ~/.profile, so ~/.bashrc never loads", "Aliases only work as root"], "a": 1}, {"type": "choice", "kind": "video", "q": "Where should an alias go so every new terminal tab has it?", "expl": "A new tab is an interactive, non-login shell, and it reads only `~/.bashrc`. Keep environment variables in `~/.profile`.", "ch": "Login shell vs interactive shell", "anchor": "ch-3", "t": 56, "opts": ["~/.bashrc", "~/.bash_profile", "/etc/hostname"], "a": 0}, {"type": "cmd", "kind": "cmd", "q": "You added an alias to `~/.bashrc`. Type the command that loads the change into the shell you are already in.", "expl": "`source` (or its short form `.`) runs the file in the current shell. `bash ~/.bashrc` runs it in a child shell, and the alias dies with it.", "ch": "The fix: one line", "anchor": "ch-5", "t": 139, "answers": ["source ~/.bashrc", ". ~/.bashrc", "source $HOME/.bashrc", ". \"$HOME/.bashrc\""]}, {"type": "cmd", "kind": "cmd", "q": "Type a `bash` command that starts a login shell (like SSH does) and only runs `true`.", "expl": "`-l` (or `--login`) makes bash a login shell, so it reads the login files: here `~/.profile`.", "ch": "Login shell vs interactive shell", "anchor": "ch-3", "t": 56, "answers": ["bash -l -c true", "bash --login -c true", "bash -lc true", "bash -l -c 'true'"]}, {"type": "choice", "kind": "trap", "q": "You create `~/.bash_profile` with just one line, `export PATH=\"$HOME/bin:$PATH\"`. Which of your startup files does a login shell read now?", "expl": "A login shell stops at the first file it finds, so `~/.profile` (and the `~/.bashrc` it loads) is skipped.", "ch": "The trap: creating .bash_profile", "anchor": "ch-4", "t": 100, "opts": ["All three: `~/.bash_profile`, `~/.profile` and `~/.bashrc`", "Only `~/.bash_profile`", "`~/.profile` first, then `~/.bash_profile`"], "a": 1}, {"type": "choice", "kind": "output", "q": "With the demo user's files (an echo line at the top of `~/.bashrc` and of `~/.profile`, no `~/.bash_profile`), what does this print?", "expl": "An interactive non-login shell, like a new terminal tab, reads only `~/.bashrc`.", "ch": "Login shell vs interactive shell", "anchor": "ch-3", "t": 56, "opts": ["-> reading ~/.bashrc", "-> reading ~/.profile\\n-> reading ~/.bashrc", "-> reading ~/.profile"], "a": 0, "show": "su demo -c \"bash -i -c true\" 2>/dev/null"}, {"type": "choice", "kind": "output", "q": "Same demo user. What does a login shell print?", "expl": "The login shell reads `~/.profile`, and Debian's default `~/.profile` then loads `~/.bashrc`.", "ch": "Login shell vs interactive shell", "anchor": "ch-3", "t": 56, "opts": ["-> reading ~/.profile", "-> reading ~/.profile\\n-> reading ~/.bashrc", "-> reading ~/.bashrc\\n-> reading ~/.profile"], "a": 1, "show": "su demo -c \"bash -l -c true\""}, {"type": "choice", "kind": "choice", "q": "Why does a login shell on Debian also get your aliases from `~/.bashrc`?", "expl": "Look for the `BASH_VERSION` block in `~/.profile`: it sources `~/.bashrc`. That's why the chain breaks when `~/.profile` is skipped.", "ch": "Login shell vs interactive shell", "anchor": "ch-3", "t": 56, "opts": ["Bash always reads every startup file", "Debian's default `~/.profile` has a few lines that load `~/.bashrc` when the shell is bash", "SSH copies `~/.bashrc` into the session"], "a": 1}, {"type": "choice", "kind": "choice", "q": "Your `~/.bash_profile` exists and login shells lost your aliases. Which line do you add to it?", "expl": "Loading `~/.profile` from `~/.bash_profile` brings back the chain: `~/.bash_profile` → `~/.profile` → `~/.bashrc`.", "ch": "The fix: one line", "anchor": "ch-5", "t": 139, "opts": ["`export PATH=\"$HOME/bin:$PATH\"`", "`[ -f ~/.profile ] && . ~/.profile`", "`alias bashrc=~/.bashrc`"], "a": 1}, {"type": "choice", "kind": "choice", "q": "Where do environment variables like `PATH` or `EDITOR` belong?", "expl": "`~/.profile` is read by login shells (bash and also plain `sh`), and the variables are inherited by everything started from there.", "ch": "The fix: one line", "anchor": "ch-5", "t": 139, "opts": ["`~/.bashrc`, next to the aliases", "`~/.profile`, read once by login shells", "`~/.bash_logout`"], "a": 1}]</script>
+<script src="../../sp.js"></script>
 <script>
 (function(){
   // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
   var v=document.getElementById('video'), id=v.getAttribute('data-yt');
-  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
-
+  function embed(t,play){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+(t!=null?'?start='+t+(play?'&autoplay=1':''):'')+'" title="Lesson video" allow="encrypted-media; picture-in-picture; autoplay" allowfullscreen loading="lazy"></iframe>'; }
+  if(id){ embed(); }
   var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
-  var root=document.getElementById('quiz-root');
-  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
-  qs.forEach(function(q,i){
-    var box=document.createElement('div'); box.className='q';
-    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
-    var fb=document.createElement('p'); fb.className='fb';
-    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
-    if(q.type==='choice'){
-      var opts=document.createElement('div'); opts.className='opts';
-      q.opts.forEach(function(o,j){
-        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
-        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
-        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
-      });
-      box.appendChild(opts);
-    } else {
-      var row=document.createElement('div'); row.className='row';
-      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
-      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
-      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
-      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
-      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
-    }
-    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
-  });
+  if(!window.SP||!qs.length) return;
+  SP.quiz({root:document.getElementById('quiz-root'), questions:qs, id:'bashrc-vs-profile', review:function(q){
+    var out=[];
+    if(id&&q.t!=null) out.push({href:'#video', text:'▶ video at '+SP.fmtT(q.t), onclick:function(e){ e.preventDefault(); embed(q.t,true); v.scrollIntoView({behavior:'smooth'}); }});
+    if(q.anchor) out.push({href:'#'+q.anchor, text:'commands: '+q.ch});
+    return out;
+  }});
 })();
 </script>
 </body>
