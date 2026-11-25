@@ -16,7 +16,7 @@
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
-  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/systemctl-journalctl" class="hide-s">Commands</a></nav>
+  <nav class="nav"><a href="../">All lessons</a><a href="../../quiz/">Test yourself</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/systemctl-journalctl" class="hide-s">Commands</a></nav>
 </div></header>
 
 <main class="wrap">
@@ -26,15 +26,14 @@
     <p class="sub">The five systemd commands you actually need, on a real systemd running in a container: check a service with systemctl status, find out why a service failed with journalctl -u, read logs since boot or the last few minutes, follow logs live, and the start vs enable trap (enable --now does both).</p>
   </div>
 
-  <div class="video" id="video" data-yt="">
+  <div class="video" id="video" data-yt="5yBAu13oXLg">
     <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
   </div>
 
-  <div class="two">
-    <section>
+  <section>
       <h2>Commands</h2>
       <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/systemctl-journalctl">terminal-tutorials/systemctl-journalctl</a>.</p>
-      <pre><code># 1. systemctl status
+      <pre class="cmds"><code><span class="ch" id="ch-2"># 1. systemctl status</span>
 $ systemctl start hello-app &amp;&amp; sleep 3 &amp;&amp; systemctl status hello-app --no-pager -n 2
 ● hello-app.service - Hello demo app
      Loaded: loaded (/etc/systemd/system/hello-app.service; disabled; preset: enabled)
@@ -51,7 +50,7 @@ $ systemctl start hello-app &amp;&amp; sleep 3 &amp;&amp; systemctl status hello
 Nov 21 23:17:51 demo hello-app[108]: tick 23:17:51
 Nov 21 23:17:53 demo hello-app[108]: tick 23:17:53
 
-# 2. Why did it fail? journalctl -u
+<span class="ch" id="ch-3"># 2. Why did it fail? journalctl -u</span>
 $ systemctl start report
 Job for report.service failed because the control process exited with error code.
 See "systemctl status report.service" and "journalctl -xeu report.service" for details.
@@ -78,7 +77,7 @@ Nov 21 23:17:55 demo systemd[1]: report.service: Main process exited, code=exite
 Nov 21 23:17:55 demo systemd[1]: report.service: Failed with result 'exit-code'.
 Nov 21 23:17:55 demo systemd[1]: Failed to start report.service - Report job (broken on purpose).
 
-# 3. Logs since boot, or the last minutes
+<span class="ch" id="ch-4"># 3. Logs since boot, or the last minutes</span>
 $ journalctl -b -u hello-app --no-pager | head -4
 Nov 21 23:17:51 demo systemd[1]: Started hello-app.service - Hello demo app.
 Nov 21 23:17:51 demo hello-app[108]: hello-app starting
@@ -88,14 +87,14 @@ $ journalctl --since "10 min ago" -p err --no-pager
 Nov 21 23:17:55 demo (ort-tool)[131]: report.service: Failed at step EXEC spawning /usr/local/bin/report-tool: No such file or directory
 Nov 21 23:17:55 demo systemd[1]: Failed to start report.service - Report job (broken on purpose).
 
-# 4. Follow logs live
+<span class="ch" id="ch-5"># 4. Follow logs live</span>
 $ timeout 5 journalctl -u hello-app -f --no-pager -n 1
 Nov 21 23:17:57 demo hello-app[108]: tick 23:17:57
 Nov 21 23:17:59 demo hello-app[108]: tick 23:17:59
 Nov 21 23:18:01 demo hello-app[108]: tick 23:18:01
 Nov 21 23:18:03 demo hello-app[108]: tick 23:18:03
 
-# 5. start vs enable
+<span class="ch" id="ch-6"># 5. start vs enable</span>
 $ systemctl is-enabled hello-app
 disabled
 $ systemctl stop hello-app &amp;&amp; systemctl enable hello-app
@@ -105,13 +104,33 @@ inactive
 $ systemctl enable --now hello-app &amp;&amp; systemctl is-active hello-app &amp;&amp; systemctl is-enabled hello-app
 active
 enabled</code></pre>
-    </section>
-    <section class="quiz" id="quiz">
-      <h2>Quick check</h2>
-      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
-      <div id="quiz-root"></div>
-    </section>
-  </div>
+  </section>
+  <section class="quiz" id="quiz">
+      <h2>Quiz</h2>
+      <p class="sub">10 questions: 2 from the video and 8 new ones. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+  <section id="practice">
+    <h2>Practice</h2>
+    <p class="sub">Do it yourself, without the video. Download the <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/systemctl-journalctl/practice">practice folder</a> and run <code>sh start.sh</code> — it opens a throwaway container (podman or docker), nothing touches your system.</p>
+    <pre><code>PRACTICE — lesson 15: why did the service fail?
+-----------------------------------------------
+/work/journal is the systemd journal copied from server web1 (it
+has two boots), and /work/rootfs is the disk of that server. No
+systemd runs in this container, so read the journal with
+journalctl -D /work/journal ... and change the server's units with
+systemctl --root=/work/rootfs ...
+
+1. backup.service failed during the LAST boot of web1. Write the
+   full path of the program it could not find to /work/missing.txt
+   (only the path, like /usr/bin/example).
+2. The program really is /usr/local/sbin/backup-run on that disk.
+   Fix /work/rootfs/etc/systemd/system/backup.service and make sure
+   it will start at every boot of web1. Leave nginx.service alone.
+
+Check: sh /practice/check.sh     Answer: /practice/solution.md</code></pre>
+    <p class="sub">Inside, <code>sh check.sh</code> tells you when you are done. Stuck? <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/systemctl-journalctl/practice/solution.md">solution.md</a> — but try first.</p>
+  </section>
 
   <section>
     <div class="note">
@@ -126,39 +145,22 @@ enabled</code></pre>
   <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
 </div></footer>
 
-<script id="quiz-data" type="application/json">[{"type": "choice", "q": "I ran systemctl start myapp. Will it start again after a reboot?", "opts": ["Yes, start is permanent", "No. Use systemctl enable --now myapp", "Only if I run daemon-reload"], "a": 1, "expl": "Start means now, enable means at boot. enable --now does both."}, {"type": "choice", "q": "How do I see the logs of one service since the last boot?", "opts": ["journalctl -b -u myapp", "systemctl logs myapp", "journalctl -f"], "a": 0, "expl": "-b is the current boot, -u picks the unit. Add -f to follow it live."}]</script>
+<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "I ran systemctl start myapp. Will it start again after a reboot?", "expl": "Start means now, enable means at boot, and they are independent. `enable --now` does both in one step.", "ch": "5. start vs enable", "anchor": "ch-6", "t": 136, "opts": ["Yes, start is permanent", "No. Use systemctl enable --now myapp", "Only if I run daemon-reload"], "a": 1}, {"type": "choice", "kind": "video", "q": "How do I see the logs of one service since the last boot?", "expl": "`-b` is the current boot, `-u` picks the unit. `journalctl -f` alone follows the logs of everything and never ends by itself.", "ch": "3. Logs since boot, or the last minutes", "anchor": "ch-4", "t": 88, "opts": ["journalctl -b -u myapp", "systemctl logs myapp", "journalctl -f"], "a": 0}, {"type": "cmd", "kind": "cmd", "q": "The `report` service failed. Type the `journalctl` command that shows only its last 5 log lines.", "expl": "`-u` picks the unit, `-n 5` keeps the last five lines. That's where the real reason is: the program doesn't exist.", "ch": "2. Why did it fail? journalctl -u", "anchor": "ch-3", "t": 57, "answers": ["journalctl -u report -n 5", "journalctl -u report -n 5 --no-pager", "journalctl -n 5 -u report", "journalctl -u report.service -n 5", "journalctl --unit report -n 5", "journalctl -u report -n5"]}, {"type": "cmd", "kind": "cmd", "q": "`notes-app` is stopped and disabled. Type one `systemctl` command that starts it now AND makes it start at every boot.", "expl": "`enable --now` = enable (at boot) + start (now). Either one alone does only half of the job.", "ch": "5. start vs enable", "anchor": "ch-6", "t": 136, "answers": ["systemctl enable --now notes-app", "systemctl --now enable notes-app", "systemctl enable notes-app --now", "systemctl enable --now notes-app.service"]}, {"type": "choice", "kind": "trap", "q": "`web-app` is stopped. You run `systemctl enable web-app`. Is it running now?", "expl": "Enable just creates the boot link. The service stays inactive until you start it (or use `enable --now`).", "ch": "5. start vs enable", "anchor": "ch-6", "t": 136, "opts": ["Yes, enable also starts it", "No: enable only sets it up for boot; use `enable --now` or `start`", "Only after `systemctl daemon-reload`"], "a": 1}, {"type": "choice", "kind": "output", "q": "`report.service` failed when we started it (its program doesn't exist). What does this print?", "expl": "A unit whose last run failed stays in the `failed` state (the red `×` in `systemctl status`) until you start it again or reset it.", "ch": "2. Why did it fail? journalctl -u", "anchor": "ch-3", "t": 57, "opts": ["failed", "inactive", "active"], "a": 0, "show": "systemctl is-active report"}, {"type": "choice", "kind": "choice", "q": "Which command shows only messages with error level or worse from the last 10 minutes?", "expl": "`--since` takes a time in plain words and `-p err` keeps error, critical, alert and emergency. `-n 10` means ten lines, not minutes.", "ch": "3. Logs since boot, or the last minutes", "anchor": "ch-4", "t": 88, "opts": ["`journalctl --since \"10 min ago\" -p err`", "`journalctl -n 10 -p err`", "`journalctl --since \"10 min ago\" -u err`"], "a": 0}, {"type": "choice", "kind": "choice", "q": "What does `journalctl -u hello-app -f` do?", "expl": "`-f` follows the log like `tail -f`. Handy in a second terminal while you restart or test a service.", "ch": "4. Follow logs live", "anchor": "ch-5", "t": 107, "opts": ["Prints the whole log of hello-app and exits", "Shows the last lines, then keeps printing new ones until you press Ctrl+C", "Shows only the lines where hello-app failed"], "a": 1}, {"type": "choice", "kind": "choice", "q": "In the output of `systemctl status hello-app`, which line tells you whether the service is running?", "expl": "`Active: active (running)` means it runs; a broken one shows `Active: failed`. `Loaded:` only says where the unit file is and if it's enabled.", "ch": "1. systemctl status", "anchor": "ch-2", "t": 32, "opts": ["`Loaded:`", "`Active:`", "`CGroup:`"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "Type the `systemctl` command that tells you whether `hello-app` will start at boot (it prints enabled or disabled).", "expl": "`is-enabled` answers \"at boot?\", `is-active` answers \"running now?\". They are separate questions.", "ch": "5. start vs enable", "anchor": "ch-6", "t": 136, "answers": ["systemctl is-enabled hello-app", "systemctl is-enabled hello-app.service"]}]</script>
+<script src="../../sp.js"></script>
 <script>
 (function(){
   // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
   var v=document.getElementById('video'), id=v.getAttribute('data-yt');
-  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
-
+  function embed(t,play){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+(t!=null?'?start='+t+(play?'&autoplay=1':''):'')+'" title="Lesson video" allow="encrypted-media; picture-in-picture; autoplay" allowfullscreen loading="lazy"></iframe>'; }
+  if(id){ embed(); }
   var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
-  var root=document.getElementById('quiz-root');
-  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
-  qs.forEach(function(q,i){
-    var box=document.createElement('div'); box.className='q';
-    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
-    var fb=document.createElement('p'); fb.className='fb';
-    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
-    if(q.type==='choice'){
-      var opts=document.createElement('div'); opts.className='opts';
-      q.opts.forEach(function(o,j){
-        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
-        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
-        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
-      });
-      box.appendChild(opts);
-    } else {
-      var row=document.createElement('div'); row.className='row';
-      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
-      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
-      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
-      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
-      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
-    }
-    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
-  });
+  if(!window.SP||!qs.length) return;
+  SP.quiz({root:document.getElementById('quiz-root'), questions:qs, id:'systemctl-journalctl', review:function(q){
+    var out=[];
+    if(id&&q.t!=null) out.push({href:'#video', text:'▶ video at '+SP.fmtT(q.t), onclick:function(e){ e.preventDefault(); embed(q.t,true); v.scrollIntoView({behavior:'smooth'}); }});
+    if(q.anchor) out.push({href:'#'+q.anchor, text:'commands: '+q.ch});
+    return out;
+  }});
 })();
 </script>
 </body>
