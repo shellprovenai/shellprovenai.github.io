@@ -16,7 +16,7 @@
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
-  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/cron-not-running" class="hide-s">Commands</a></nav>
+  <nav class="nav"><a href="../">All lessons</a><a href="../../quiz/">Test yourself</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/cron-not-running" class="hide-s">Commands</a></nav>
 </div></header>
 
 <main class="wrap">
@@ -30,11 +30,10 @@
     <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
   </div>
 
-  <div class="two">
-    <section>
+  <section>
       <h2>Commands</h2>
       <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/cron-not-running">terminal-tutorials/cron-not-running</a>.</p>
-      <pre><code># A script that works
+      <pre class="cmds"><code><span class="ch" id="ch-2"># A script that works</span>
 $ cat backup.sh
 #!/bin/sh
 report-tool &gt; report.txt
@@ -43,7 +42,7 @@ $ ./backup.sh &amp;&amp; cat report.txt
 saved report
 report for demo: 42 orders
 
-# Schedule it, and log the output
+<span class="ch" id="ch-3"># Schedule it, and log the output</span>
 $ cat first.cron
 # min hour day month weekday  command
 * * * * * /lab/jobs/backup.sh &gt;&gt; /tmp/backup.log 2&gt;&amp;1
@@ -53,7 +52,7 @@ $ crontab first.cron &amp;&amp; crontab -l
 * * * * * /lab/jobs/backup.sh &gt;&gt; /tmp/backup.log 2&gt;&amp;1
 * * * * * env &gt; /tmp/cron-env.txt
 
-# Why it fails
+<span class="ch" id="ch-4"># Why it fails</span>
 $ cat /tmp/backup.log
 /lab/jobs/backup.sh: 2: report-tool: not found
 saved report
@@ -66,7 +65,7 @@ PWD=/root
 $ ls /root
 report.txt
 
-# The fix: PATH and cd in the crontab
+<span class="ch" id="ch-5"># The fix: PATH and cd in the crontab</span>
 $ cat fixed.cron
 PATH=/usr/local/bin:/usr/bin:/bin
 # min hour day month weekday  command
@@ -75,23 +74,47 @@ PATH=/usr/local/bin:/usr/bin:/bin
 * * * * * echo "ran at $(date +\%H:\%M)" &gt;&gt; /tmp/fixed.log
 $ crontab fixed.cron
 
-# Check it
+<span class="ch" id="ch-6"># Check it</span>
 $ tail -n 1 /tmp/backup.log &amp;&amp; cat report.txt
 saved report
 report for demo: 42 orders
 
-# The percent-sign trap
+<span class="ch" id="ch-7"># The percent-sign trap</span>
 $ cat /tmp/broken.log
 cat: /tmp/broken.log: No such file or directory
 $ cat /tmp/fixed.log
 ran at 20:08</code></pre>
-    </section>
-    <section class="quiz" id="quiz">
-      <h2>Quick check</h2>
-      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
-      <div id="quiz-root"></div>
-    </section>
-  </div>
+  </section>
+  <section class="quiz" id="quiz">
+      <h2>Quiz</h2>
+      <p class="sub">10 questions: 2 from the video and 8 new ones. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+  <section id="practice">
+    <h2>Practice</h2>
+    <p class="sub">Do it yourself, without the video. Download the <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/cron-not-running/practice">practice folder</a> and run <code>sh start.sh</code> — it opens a throwaway container (podman or docker), nothing touches your system.</p>
+    <pre><code>PRACTICE — lesson 09: a cron job that really works
+--------------------------------------------------
+/work/jobs/dump.sh makes a nightly database dump. It calls the
+tool dumptool from /work/bin and writes dump.sql into the folder
+it runs in. By hand it works:
+  cd /work/jobs &amp;&amp; PATH=/work/bin:$PATH ./dump.sh
+Don't change dump.sh or dumptool. Write a crontab file
+/work/dump.cron and install it with crontab:
+
+1. Run dump.sh every day at 02:30 so that it works in cron's
+   environment (PATH is only /usr/bin:/bin, the job starts in
+   /root), dump.sql lands in /work/jobs, and BOTH the output and
+   the errors are appended to /work/logs/dump.log.
+2. Then change the log to one file per day, named with today's
+   date, like /work/logs/dump-2026-11-25.log ($(date +%F)).
+   Install the new version too.
+
+Check: sh /practice/check.sh     Answer: /practice/solution.md
+(check.sh runs your job the way cron would: same PATH, same
+folder, same handling of special characters.)</code></pre>
+    <p class="sub">Inside, <code>sh check.sh</code> tells you when you are done. Stuck? <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/cron-not-running/practice/solution.md">solution.md</a> — but try first.</p>
+  </section>
 
   <section>
     <div class="note">
@@ -106,39 +129,22 @@ ran at 20:08</code></pre>
   <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
 </div></footer>
 
-<script id="quiz-data" type="application/json">[{"type": "choice", "q": "My script works by hand, but in cron it says report-tool: not found. Why?", "opts": ["The script has no execute bit", "cron's PATH is only /usr/bin:/bin", "cron jobs must run as root"], "a": 1, "expl": "Set a path line at the top of the crontab, or call the program by its full path."}, {"type": "choice", "q": "What does a plain % sign do inside a crontab line?", "opts": ["Nothing, it is a normal character", "It starts a new line and cuts the command", "It comments out the rest of the line"], "a": 1, "expl": "Escape every percent sign with a backslash, or move the command into a script."}]</script>
+<script id="quiz-data" type="application/json">[{"type": "cmd", "kind": "cmd", "q": "Cron runs `/lab/jobs/backup.sh`. Type the command part of the crontab line that appends its output AND its errors to `/tmp/q01.log`.", "expl": "`>>` appends the output, and `2>&1` (written after it) sends the errors to the same file. Without it, the error never reaches the log.", "ch": "Schedule it, and log the output", "anchor": "ch-3", "t": 53, "answers": ["/lab/jobs/backup.sh >> /tmp/q01.log 2>&1", "/lab/jobs/backup.sh >>/tmp/q01.log 2>&1"]}, {"type": "choice", "kind": "video", "q": "My script works by hand, but in cron it says report-tool: not found. Why?", "expl": "Set a path line at the top of the crontab, or call the program by its full path.", "ch": "Why it fails", "anchor": "ch-4", "t": 89, "opts": ["The script has no execute bit", "cron's PATH is only /usr/bin:/bin", "cron jobs must run as root"], "a": 1}, {"type": "choice", "kind": "output", "q": "The helper job `env > /tmp/cron-env.txt` ran from cron (as root). What does this print?", "expl": "Cron gives jobs a tiny PATH without /usr/local/bin, and starts them in the home folder, not in your project.", "ch": "Why it fails", "anchor": "ch-4", "t": 89, "opts": ["PATH=/usr/local/bin:/usr/bin:/bin\\nPWD=/lab/jobs", "PATH=/usr/bin:/bin\\nPWD=/lab/jobs", "PATH=/usr/bin:/bin\\nPWD=/root"], "a": 2, "show": "grep -E '^(PATH|PWD)=' /tmp/cron-env.txt"}, {"type": "choice", "kind": "trap", "q": "The log shows `report-tool: not found` and then `saved report`. Did the job save a report?", "expl": "A shell script doesn't stop at a failed command, so the last line can look fine. Always read the whole log.", "ch": "Why it fails", "anchor": "ch-4", "t": 89, "opts": ["Yes, `saved report` proves it", "No: the script just kept going after the error, and `report.txt` is empty", "Yes, but in the wrong format"], "a": 1}, {"type": "choice", "kind": "choice", "q": "`backup.sh` writes `report.txt` with a relative path. Before the fix, where did cron's run put it?", "expl": "Cron starts jobs in the home folder, so a relative path is relative to that, not to the script's folder.", "ch": "Why it fails", "anchor": "ch-4", "t": 89, "opts": ["In `/lab/jobs`, next to the script", "In `/root`, the home folder", "In `/tmp`, next to the log"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "You're in `/lab/jobs`. Type the command that installs the file `fixed.cron` as your crontab.", "expl": "`crontab FILE` replaces your whole crontab with that file. Check it with `crontab -l`.", "ch": "The fix: PATH and cd in the crontab", "anchor": "ch-5", "t": 137, "answers": ["crontab fixed.cron", "crontab ./fixed.cron", "crontab /lab/jobs/fixed.cron", "crontab - < fixed.cron"]}, {"type": "choice", "kind": "choice", "q": "Why does the fixed line start with `cd /lab/jobs &&`?", "expl": "After `cd`, `report.txt` lands in the project folder. Full paths inside the script would work too.", "ch": "The fix: PATH and cd in the crontab", "anchor": "ch-5", "t": 137, "opts": ["cron can't run a script without `cd` first", "cron starts jobs in the home folder, and the script uses a relative path", "`cd` also sets the PATH for the job"], "a": 1}, {"type": "choice", "kind": "video", "q": "What does a plain % sign do inside a crontab line?", "expl": "Escape every percent sign with a backslash, or move the command into a script.", "ch": "The percent-sign trap", "anchor": "ch-7", "t": 175, "opts": ["Nothing, it is a normal character", "It starts a new line and cuts the command", "It comments out the rest of the line"], "a": 1}, {"type": "choice", "kind": "trap", "q": "Which of these crontab lines really writes today's date to the file?", "expl": "Quotes don't help: cron cuts the line at the first plain `%` before the shell sees it. Only `\\%` is safe.", "ch": "The percent-sign trap", "anchor": "ch-7", "t": 175, "opts": ["`* * * * * date +'%F' > /tmp/day.log`", "`* * * * * date +\"%F\" > /tmp/day.log`", "`* * * * * date +\\%F > /tmp/day.log`"], "a": 2}, {"type": "choice", "kind": "choice", "q": "After the fix, the log ends with `saved report` and no error. Which change fixed `report-tool: not found`?", "expl": "The shell finds programs through PATH. `cd` only fixes where `report.txt` lands.", "ch": "Check it", "anchor": "ch-6", "t": 159, "opts": ["The `cd /lab/jobs` before the script", "The `PATH=` line at the top of the crontab", "The `2>&1` at the end of the line"], "a": 1}]</script>
+<script src="../../sp.js"></script>
 <script>
 (function(){
   // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
   var v=document.getElementById('video'), id=v.getAttribute('data-yt');
-  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
-
+  function embed(t,play){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+(t!=null?'?start='+t+(play?'&autoplay=1':''):'')+'" title="Lesson video" allow="encrypted-media; picture-in-picture; autoplay" allowfullscreen loading="lazy"></iframe>'; }
+  if(id){ embed(); }
   var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
-  var root=document.getElementById('quiz-root');
-  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
-  qs.forEach(function(q,i){
-    var box=document.createElement('div'); box.className='q';
-    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
-    var fb=document.createElement('p'); fb.className='fb';
-    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
-    if(q.type==='choice'){
-      var opts=document.createElement('div'); opts.className='opts';
-      q.opts.forEach(function(o,j){
-        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
-        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
-        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
-      });
-      box.appendChild(opts);
-    } else {
-      var row=document.createElement('div'); row.className='row';
-      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
-      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
-      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
-      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
-      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
-    }
-    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
-  });
+  if(!window.SP||!qs.length) return;
+  SP.quiz({root:document.getElementById('quiz-root'), questions:qs, id:'cron-not-running', review:function(q){
+    var out=[];
+    if(id&&q.t!=null) out.push({href:'#video', text:'▶ video at '+SP.fmtT(q.t), onclick:function(e){ e.preventDefault(); embed(q.t,true); v.scrollIntoView({behavior:'smooth'}); }});
+    if(q.anchor) out.push({href:'#'+q.anchor, text:'commands: '+q.ch});
+    return out;
+  }});
 })();
 </script>
 </body>
