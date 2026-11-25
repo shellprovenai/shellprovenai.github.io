@@ -16,7 +16,7 @@
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
-  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bash-redirection" class="hide-s">Commands</a></nav>
+  <nav class="nav"><a href="../">All lessons</a><a href="../../quiz/">Test yourself</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bash-redirection" class="hide-s">Commands</a></nav>
 </div></header>
 
 <main class="wrap">
@@ -30,24 +30,23 @@
     <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
   </div>
 
-  <div class="two">
-    <section>
+  <section>
       <h2>Commands</h2>
       <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bash-redirection">terminal-tutorials/bash-redirection</a>.</p>
-      <pre><code># Two output streams
+      <pre class="cmds"><code><span class="ch" id="ch-2"># Two output streams</span>
 $ ls logs missing
 ls: cannot access 'missing': No such file or directory
 logs:
 a.log
 
-# &gt; sends stdout to a file
+<span class="ch" id="ch-3"># &gt; sends stdout to a file</span>
 $ ls logs missing &gt; out.txt
 ls: cannot access 'missing': No such file or directory
 $ cat out.txt
 logs:
 a.log
 
-# 2&gt; sends stderr to a file
+<span class="ch" id="ch-4"># 2&gt; sends stderr to a file</span>
 $ ls logs missing 2&gt; err.txt
 logs:
 a.log
@@ -57,7 +56,7 @@ $ ls logs missing 2&gt;/dev/null
 logs:
 a.log
 
-# 2&gt;&amp;1: both streams into one file
+<span class="ch" id="ch-5"># 2&gt;&amp;1: both streams into one file</span>
 $ ls logs missing &gt; all.txt 2&gt;&amp;1
 $ cat all.txt
 ls: cannot access 'missing': No such file or directory
@@ -69,7 +68,7 @@ $ cat wrong.txt
 logs:
 a.log
 
-# &gt; overwrites, &gt;&gt; appends
+<span class="ch" id="ch-6"># &gt; overwrites, &gt;&gt; appends</span>
 $ echo first &gt; notes.txt &amp;&amp; echo second &gt; notes.txt &amp;&amp; cat notes.txt
 second
 $ echo third &gt;&gt; notes.txt &amp;&amp; cat notes.txt
@@ -79,14 +78,14 @@ $ set -o noclobber &amp;&amp; echo oops &gt; notes.txt
 /tmp/.sp_seg.sh: line 8: notes.txt: cannot overwrite existing file
 $ set +o noclobber
 
-# Pipes only carry stdout
+<span class="ch" id="ch-7"># Pipes only carry stdout</span>
 $ ls logs missing | wc -l
 ls: cannot access 'missing': No such file or directory
 2
 $ ls logs missing 2&gt;&amp;1 | wc -l
 3
 
-# tee: save it and see it
+<span class="ch" id="ch-8"># tee: save it and see it</span>
 $ ls logs missing 2&gt;&amp;1 | tee run.log
 ls: cannot access 'missing': No such file or directory
 logs:
@@ -95,13 +94,31 @@ $ cat run.log
 ls: cannot access 'missing': No such file or directory
 logs:
 a.log</code></pre>
-    </section>
-    <section class="quiz" id="quiz">
-      <h2>Quick check</h2>
-      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
-      <div id="quiz-root"></div>
-    </section>
-  </div>
+  </section>
+  <section class="quiz" id="quiz">
+      <h2>Quiz</h2>
+      <p class="sub">10 questions: 2 from the video and 8 new ones. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+  <section id="practice">
+    <h2>Practice</h2>
+    <p class="sub">Do it yourself, without the video. Download the <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bash-redirection/practice">practice folder</a> and run <code>sh start.sh</code> — it opens a throwaway container (podman or docker), nothing touches your system.</p>
+    <pre><code>PRACTICE — lesson 06: redirection and pipes
+-------------------------------------------
+/work/nightly.sh is a (simulated) backup script. It prints progress
+on stdout and errors on stderr. /work/logs/nightly.log already holds
+the lines of older runs. Don't change nightly.sh.
+
+1. Run ./nightly.sh once so that ALL of its output, the errors
+   included, is added to the end of logs/nightly.log. The old lines
+   must stay, and nothing should appear on the screen.
+2. Count the lines of its output that start with ERROR: using a
+   pipe into grep, and save just the number in
+   /work/error-count.txt (don't add to nightly.log again).
+
+Check: sh /practice/check.sh     Answer: /practice/solution.md</code></pre>
+    <p class="sub">Inside, <code>sh check.sh</code> tells you when you are done. Stuck? <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/bash-redirection/practice/solution.md">solution.md</a> — but try first.</p>
+  </section>
 
   <section>
     <div class="note">
@@ -116,39 +133,22 @@ a.log</code></pre>
   <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
 </div></footer>
 
-<script id="quiz-data" type="application/json">[{"type": "choice", "q": "I want stdout and stderr in one file. Is it cmd 2>&1 > all.txt or cmd > all.txt 2>&1?", "opts": ["cmd 2>&1 > all.txt", "cmd > all.txt 2>&1"], "a": 1, "expl": "Redirections run left to right. Point stream one at the file first, then copy stream two there."}, {"type": "choice", "q": "Which arrow adds to the end of a log file instead of wiping it: > or >>?", "opts": [">", ">>"], "a": 1, "expl": "Two arrows append. A single arrow replaces the whole file."}]</script>
+<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "I want stdout and stderr in one file. Is it cmd 2>&1 > all.txt or cmd > all.txt 2>&1?", "expl": "Redirections run left to right. Point stream one at the file first, then copy stream two there.", "ch": "2>&1: both streams into one file", "anchor": "ch-5", "t": 99, "opts": ["cmd 2>&1 > all.txt", "cmd > all.txt 2>&1", "cmd 2> all.txt"], "a": 1}, {"type": "choice", "kind": "video", "q": "Which arrow adds to the end of a log file instead of wiping it: > or >>?", "expl": "Two arrows append. A single arrow replaces the whole file.", "ch": "> overwrites, >> appends", "anchor": "ch-6", "t": 150, "opts": [">", ">>", "&>"], "a": 1}, {"type": "choice", "kind": "output", "q": "In the demo folder (`logs` exists, `missing` doesn't), what appears on the screen?", "expl": "`>` only moves stream one (the listing) into the file. The error travels on stream two and still reaches the screen.", "ch": "> sends stdout to a file", "anchor": "ch-3", "t": 53, "opts": ["logs:\\na.log", "ls: cannot access 'missing': No such file or directory", "Nothing, everything goes into `out.txt`"], "a": 1, "show": "ls logs missing > out.txt"}, {"type": "choice", "kind": "output", "q": "In the demo folder, what appears on the screen?", "expl": "The pipe only carries stdout, so `wc` counts two lines. The error skips the pipe and lands on the screen.", "ch": "Pipes only carry stdout", "anchor": "ch-7", "t": 180, "opts": ["3", "2", "ls: cannot access 'missing': No such file or directory\\n2"], "a": 2, "show": "ls logs missing | wc -l"}, {"type": "choice", "kind": "trap", "q": "You run `ls logs missing | tee run.log`. The error shows on the screen, but it isn't in `run.log`. Why?", "expl": "Add `2>&1` before the pipe (`ls logs missing 2>&1 | tee run.log`) to send both streams into tee.", "ch": "Pipes only carry stdout", "anchor": "ch-7", "t": 180, "opts": ["`tee` only saves the first line", "The pipe only carries stdout; the error went straight to the screen", "The error happened before `tee` started"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "`./report.sh` prints results on stdout and a warning on stderr. Type a command that runs it and throws away only the warning.", "expl": "`2>` redirects stream two only, and `/dev/null` throws away whatever is written to it.", "ch": "2> sends stderr to a file", "anchor": "ch-4", "t": 76, "answers": ["./report.sh 2>/dev/null", "./report.sh 2> /dev/null", "2>/dev/null ./report.sh"]}, {"type": "cmd", "kind": "cmd", "q": "Type a command that saves both stdout and stderr of `./report.sh` into the file `all.txt`, so nothing shows on the screen.", "expl": "File first, then `2>&1`. `&> all.txt` is bash's short form for the same thing.", "ch": "2>&1: both streams into one file", "anchor": "ch-5", "t": 99, "answers": ["./report.sh > all.txt 2>&1", "./report.sh >all.txt 2>&1", "./report.sh 1> all.txt 2>&1", "./report.sh &> all.txt", "./report.sh &>all.txt"]}, {"type": "cmd", "kind": "cmd", "q": "Type a command that counts every line of `ls logs missing` with `wc -l`, the error line included.", "expl": "`2>&1` before the pipe sends stream two into it too. `|&` is bash's short form of `2>&1 |`.", "ch": "Pipes only carry stdout", "anchor": "ch-7", "t": 180, "answers": ["ls logs missing 2>&1 | wc -l", "ls missing logs 2>&1 | wc -l", "ls logs missing |& wc -l"]}, {"type": "cmd", "kind": "cmd", "q": "`run.log` already holds an old run. Type a command that shows all output of `./report.sh` (both streams) on the screen and also adds it to the end of `run.log`.", "expl": "`tee` writes to the file and passes everything on to the screen; `-a` appends instead of overwriting.", "ch": "tee: save it and see it", "anchor": "ch-8", "t": 201, "answers": ["./report.sh 2>&1 | tee -a run.log", "./report.sh 2>&1 | tee --append run.log", "./report.sh |& tee -a run.log"]}, {"type": "choice", "kind": "choice", "q": "You ran `set -o noclobber`. What happens with `echo oops > notes.txt` if `notes.txt` already exists?", "expl": "noclobber stops a single `>` from overwriting an existing file. `>>` still appends.", "ch": "> overwrites, >> appends", "anchor": "ch-6", "t": 150, "opts": ["The text is added to the end of the file", "Bash refuses and leaves the file as it was", "The file is overwritten, but bash prints a warning"], "a": 1}]</script>
+<script src="../../sp.js"></script>
 <script>
 (function(){
   // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
   var v=document.getElementById('video'), id=v.getAttribute('data-yt');
-  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
-
+  function embed(t,play){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+(t!=null?'?start='+t+(play?'&autoplay=1':''):'')+'" title="Lesson video" allow="encrypted-media; picture-in-picture; autoplay" allowfullscreen loading="lazy"></iframe>'; }
+  if(id){ embed(); }
   var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
-  var root=document.getElementById('quiz-root');
-  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
-  qs.forEach(function(q,i){
-    var box=document.createElement('div'); box.className='q';
-    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
-    var fb=document.createElement('p'); fb.className='fb';
-    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
-    if(q.type==='choice'){
-      var opts=document.createElement('div'); opts.className='opts';
-      q.opts.forEach(function(o,j){
-        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
-        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
-        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
-      });
-      box.appendChild(opts);
-    } else {
-      var row=document.createElement('div'); row.className='row';
-      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
-      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
-      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
-      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
-      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
-    }
-    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
-  });
+  if(!window.SP||!qs.length) return;
+  SP.quiz({root:document.getElementById('quiz-root'), questions:qs, id:'bash-redirection', review:function(q){
+    var out=[];
+    if(id&&q.t!=null) out.push({href:'#video', text:'▶ video at '+SP.fmtT(q.t), onclick:function(e){ e.preventDefault(); embed(q.t,true); v.scrollIntoView({behavior:'smooth'}); }});
+    if(q.anchor) out.push({href:'#'+q.anchor, text:'commands: '+q.ch});
+    return out;
+  }});
 })();
 </script>
 </body>
