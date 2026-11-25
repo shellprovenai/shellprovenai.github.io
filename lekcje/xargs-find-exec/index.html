@@ -16,7 +16,7 @@
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
-  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/xargs-find-exec" class="hide-s">Commands</a></nav>
+  <nav class="nav"><a href="../">All lessons</a><a href="../../quiz/">Test yourself</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/xargs-find-exec" class="hide-s">Commands</a></nav>
 </div></header>
 
 <main class="wrap">
@@ -30,11 +30,10 @@
     <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
   </div>
 
-  <div class="two">
-    <section>
+  <section>
       <h2>Commands</h2>
       <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/xargs-find-exec">terminal-tutorials/xargs-find-exec</a>.</p>
-      <pre><code># The space problem
+      <pre class="cmds"><code><span class="ch" id="ch-2"># The space problem</span>
 $ ls
 My Report.txt
 Q3 plan.txt
@@ -50,14 +49,14 @@ wc: ./Q3: No such file or directory
 wc: plan.txt: No such file or directory
 3 total
 
-# The fix: -print0 and xargs -0
+<span class="ch" id="ch-3"># The fix: -print0 and xargs -0</span>
 $ find . -name '*.txt' -print0 | xargs -0 wc -l
  3 ./notes.txt
  2 ./My Report.txt
  1 ./Q3 plan.txt
  6 total
 
-# find -exec: \; or +
+<span class="ch" id="ch-4"># find -exec: \; or +</span>
 $ find . -name '*.txt' -exec echo run {} \;
 run ./notes.txt
 run ./My Report.txt
@@ -65,7 +64,7 @@ run ./Q3 plan.txt
 $ find . -name '*.txt' -exec echo run {} +
 run ./notes.txt ./My Report.txt ./Q3 plan.txt
 
-# Preview before you delete
+<span class="ch" id="ch-5"># Preview before you delete</span>
 $ find . -name '*.tmp' -print0 | xargs -0 echo rm --
 rm -- ./old 2.tmp ./old1.tmp
 $ find . -name '*.tmp' -print0 | xargs -0 rm -- &amp;&amp; ls
@@ -74,7 +73,7 @@ Q3 plan.txt
 logs
 notes.txt
 
-# Parallel jobs with xargs -P
+<span class="ch" id="ch-6"># Parallel jobs with xargs -P</span>
 $ time (printf '1\n1\n1\n1\n' | xargs -n 1 sleep)
 
 real	0m4.006s
@@ -90,13 +89,31 @@ app 1.log.gz
 app 2.log.gz
 app 3.log.gz
 app 4.log.gz</code></pre>
-    </section>
-    <section class="quiz" id="quiz">
-      <h2>Quick check</h2>
-      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
-      <div id="quiz-root"></div>
-    </section>
-  </div>
+  </section>
+  <section class="quiz" id="quiz">
+      <h2>Quiz</h2>
+      <p class="sub">10 questions: 2 from the video and 8 new ones. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+  <section id="practice">
+    <h2>Practice</h2>
+    <p class="sub">Do it yourself, without the video. Download the <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/xargs-find-exec/practice">practice folder</a> and run <code>sh start.sh</code> — it opens a throwaway container (podman or docker), nothing touches your system.</p>
+    <pre><code>PRACTICE — lesson 17: xargs and find -exec done right
+-----------------------------------------------------
+/work/project is a small project full of leftovers. Several file
+names have spaces in them, like "old report.bak". Use find with
+xargs or -exec:
+
+1. Delete every *.bak file anywhere in /work/project (there are
+   four). Nothing else may disappear: notes/draft is a real file
+   and must stay. Preview with echo first!
+2. Compress every *.log file in /work/project/logs with gzip, one
+   file per gzip, up to 4 at a time (xargs -P), so each becomes
+   NAME.log.gz. logs/README.txt must stay as it is.
+
+Check: sh /practice/check.sh     Answer: /practice/solution.md</code></pre>
+    <p class="sub">Inside, <code>sh check.sh</code> tells you when you are done. Stuck? <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/xargs-find-exec/practice/solution.md">solution.md</a> — but try first.</p>
+  </section>
 
   <section>
     <div class="note">
@@ -111,39 +128,22 @@ app 4.log.gz</code></pre>
   <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
 </div></footer>
 
-<script id="quiz-data" type="application/json">[{"type": "choice", "q": "find . -name '*.txt' | xargs wc -l breaks on \"My Report.txt\". What fixes it?", "opts": ["find . -name '*.txt' | xargs -n 1 wc -l", "find . -name '*.txt' -print0 | xargs -0 wc -l", "find . -name '*.txt' | xargs -P 4 wc -l"], "a": 1, "expl": "Null bytes can't appear in file names, so -print0 with -0 splits the list safely."}, {"type": "choice", "q": "find -exec cmd {} \\; versus find -exec cmd {} + — what is the difference?", "opts": ["\\; runs the command once per file, + passes many files at once", "+ runs the command once per file, \\; passes many files at once", "There is no difference"], "a": 0, "expl": "The plus form works like xargs and is much faster for many files."}]</script>
+<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "find . -name '*.txt' | xargs wc -l breaks on \"My Report.txt\". What fixes it?", "expl": "Null bytes can't appear in file names, so -print0 with -0 splits the list safely.", "ch": "The fix: -print0 and xargs -0", "anchor": "ch-3", "t": 50, "opts": ["find . -name '*.txt' | xargs -n 1 wc -l", "find . -name '*.txt' -print0 | xargs -0 wc -l", "find . -name '*.txt' | xargs -P 4 wc -l"], "a": 1}, {"type": "choice", "kind": "video", "q": "find -exec cmd {} \\; versus find -exec cmd {} + — what is the difference?", "expl": "The plus form works like xargs and is much faster for many files.", "ch": "find -exec: \\; or +", "anchor": "ch-4", "t": 71, "opts": ["\\; runs the command once per file, + passes many files at once", "+ runs the command once per file, \\; passes many files at once", "There is no difference"], "a": 0}, {"type": "choice", "kind": "trap", "q": "You run `find . -name '*.txt' | xargs wc -l` and one file is called `My Report.txt`. What happens to that file?", "expl": "Plain xargs splits its input on spaces and new lines, so one name with a space becomes two missing files.", "ch": "The space problem", "anchor": "ch-2", "t": 29, "opts": ["It is counted normally", "xargs splits it into two names, `./My` and `Report.txt`, and wc can't find them", "xargs skips it silently"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "Type a command that runs `wc -l` on every `*.txt` file in the current folder and still works when a name has a space in it.", "expl": "`-print0` ends every name with a null byte and `xargs -0` splits on exactly that. `-exec wc -l {} +` is just as safe.", "ch": "The fix: -print0 and xargs -0", "anchor": "ch-3", "t": 50, "answers": ["find . -name '*.txt' -print0 | xargs -0 wc -l", "find . -name \"*.txt\" -print0 | xargs -0 wc -l", "find . -type f -name '*.txt' -print0 | xargs -0 wc -l", "find . -name '*.txt' -print0 | xargs --null wc -l", "find . -name '*.txt' -exec wc -l {} +"]}, {"type": "choice", "kind": "output", "q": "In the demo folder there are three `.txt` files. How many lines does this print?", "expl": "With `+`, find passes all three names to a single `echo`, so you get one line. With `\\;` you'd get three.", "ch": "find -exec: \\; or +", "anchor": "ch-4", "t": 71, "opts": ["1", "3", "4"], "a": 0, "show": "find . -name '*.txt' -exec echo run {} + | wc -l"}, {"type": "cmd", "kind": "cmd", "q": "Type a command that only PRINTS `rm --` followed by every `*.tmp` file (safe for spaces), so you can check it before deleting anything.", "expl": "Putting `echo` in front shows exactly what would run, and nothing is deleted. Drop the `echo` when it looks right.", "ch": "Preview before you delete", "anchor": "ch-5", "t": 102, "answers": ["find . -name '*.tmp' -print0 | xargs -0 echo rm --", "find . -name \"*.tmp\" -print0 | xargs -0 echo rm --", "find . -type f -name '*.tmp' -print0 | xargs -0 echo rm --"]}, {"type": "choice", "kind": "choice", "q": "Why does the lesson write `rm --` instead of just `rm`?", "expl": "Without `--`, a name that starts with a dash would be read as an option instead of a file.", "ch": "Preview before you delete", "anchor": "ch-5", "t": 102, "opts": ["`--` makes rm ask before each file", "`--` tells rm that no options follow, so a file named like `-v` is treated as a file", "`--` makes rm delete folders too"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "Type a command that gzips every `*.log` file in `logs` (some names have spaces), one file per gzip, up to 4 at a time.", "expl": "`-P 4` runs up to four gzips at once and `-n 1` gives each one a single file; `-print0` with `-0` keeps \"app 1.log\" in one piece.", "ch": "Parallel jobs with xargs -P", "anchor": "ch-6", "t": 123, "answers": ["find logs -name '*.log' -print0 | xargs -0 -n 1 -P 4 gzip", "find logs -name '*.log' -print0 | xargs -0 -P 4 -n 1 gzip", "find logs -name '*.log' -print0 | xargs -0 -n1 -P4 gzip", "find logs -name \"*.log\" -print0 | xargs -0 -P 4 -n 1 gzip"]}, {"type": "choice", "kind": "choice", "q": "What does `-n 1` do in `xargs -n 1 -P 4 gzip`?", "expl": "`-n 1` starts one command per input item; `-P 4` decides how many of them run at the same time.", "ch": "Parallel jobs with xargs -P", "anchor": "ch-6", "t": 123, "opts": ["Runs only one job at a time", "Gives each command just one argument (one file)", "Stops after the first file"], "a": 1}, {"type": "choice", "kind": "output", "q": "What does this print?", "expl": "`-n 2` gives each `echo` at most two items, so echo runs twice.", "ch": "Parallel jobs with xargs -P", "anchor": "ch-6", "t": 123, "opts": ["a b\\nc d", "a\\nb\\nc\\nd", "a b c d"], "a": 0, "show": "printf 'a\\nb\\nc\\nd\\n' | xargs -n 2 echo"}]</script>
+<script src="../../sp.js"></script>
 <script>
 (function(){
   // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
   var v=document.getElementById('video'), id=v.getAttribute('data-yt');
-  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
-
+  function embed(t,play){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+(t!=null?'?start='+t+(play?'&autoplay=1':''):'')+'" title="Lesson video" allow="encrypted-media; picture-in-picture; autoplay" allowfullscreen loading="lazy"></iframe>'; }
+  if(id){ embed(); }
   var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
-  var root=document.getElementById('quiz-root');
-  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
-  qs.forEach(function(q,i){
-    var box=document.createElement('div'); box.className='q';
-    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
-    var fb=document.createElement('p'); fb.className='fb';
-    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
-    if(q.type==='choice'){
-      var opts=document.createElement('div'); opts.className='opts';
-      q.opts.forEach(function(o,j){
-        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
-        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
-        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
-      });
-      box.appendChild(opts);
-    } else {
-      var row=document.createElement('div'); row.className='row';
-      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
-      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
-      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
-      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
-      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
-    }
-    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
-  });
+  if(!window.SP||!qs.length) return;
+  SP.quiz({root:document.getElementById('quiz-root'), questions:qs, id:'xargs-find-exec', review:function(q){
+    var out=[];
+    if(id&&q.t!=null) out.push({href:'#video', text:'▶ video at '+SP.fmtT(q.t), onclick:function(e){ e.preventDefault(); embed(q.t,true); v.scrollIntoView({behavior:'smooth'}); }});
+    if(q.anchor) out.push({href:'#'+q.anchor, text:'commands: '+q.ch});
+    return out;
+  }});
 })();
 </script>
 </body>
