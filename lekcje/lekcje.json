@@ -114,8 +114,8 @@
    "slug": "ps-top-kill",
    "title": "What's eating your CPU? Find it with ps and top, and stop it safely (SIGTERM vs SIGKILL)",
    "youtube_id": "p-A9XZask4w",
-   "quiz": 2,
-   "pool": 0,
+   "quiz": 10,
+   "pool": 10,
    "practice": false
   },
   {
@@ -141,9 +141,9 @@
    "slug": "bashrc-vs-profile",
    "title": ".bashrc vs .profile vs .bash_profile: why your alias works in one terminal and not the other",
    "youtube_id": "MIiZMT6JqLU",
-   "quiz": 9,
-   "pool": 9,
-   "practice": false
+   "quiz": 10,
+   "pool": 10,
+   "practice": true
   },
   {
    "num": "17",
