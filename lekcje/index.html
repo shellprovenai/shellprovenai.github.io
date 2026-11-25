@@ -12,12 +12,13 @@
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href="../"><img src="../img/profil.png" alt="">ShellProven</a>
-  <nav class="nav"><a href="../#how">How it works</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials" class="hide-s">Commands</a></nav>
+  <nav class="nav"><a href="../quiz/">Test yourself</a><a href="../#how" class="hide-s">How it works</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials" class="hide-s">Commands</a></nav>
 </div></header>
 <main class="wrap">
   <section>
     <h2>Lessons</h2>
-    <p class="sub">Each lesson: the video, the exact commands, and a two-question quick check you can try here.</p>
+    <p class="sub">Each lesson: the video, the exact commands, a quiz with a grade, and a practice task you can do yourself.</p>
+    <div class="progress" id="progress" hidden><div class="p-row"><span class="p-text"></span><a class="p-quiz" href="../quiz/">Test yourself: 10 random questions →</a></div><div class="p-bar"><div class="p-fill"></div></div></div>
     <div class="lessons">
       <a class="lesson" href="find-changed-24h/"><span class="num">01</span><div><h3>Find files changed in the last 24 hours (and the -mtime +1 trap)</h3></div></a>
       <a class="lesson" href="grep-r-excludes/"><span class="num">02</span><div><h3>Search a whole project with grep -r, without node_modules, .git or binary junk</h3></div></a>
@@ -41,5 +42,7 @@
   </section>
 </main>
 <footer><div class="wrap"><span>© ShellProven · <a href="../privacy.html">Privacy policy</a></span><span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span></div></footer>
+<script src="../sp.js"></script>
+<script>if(window.SP) SP.progress('../');</script>
 </body>
 </html>
