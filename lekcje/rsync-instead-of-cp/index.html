@@ -16,7 +16,7 @@
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
-  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/rsync-instead-of-cp" class="hide-s">Commands</a></nav>
+  <nav class="nav"><a href="../">All lessons</a><a href="../../quiz/">Test yourself</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/rsync-instead-of-cp" class="hide-s">Commands</a></nav>
 </div></header>
 
 <main class="wrap">
@@ -30,11 +30,10 @@
     <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
   </div>
 
-  <div class="two">
-    <section>
+  <section>
       <h2>Commands</h2>
       <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/rsync-instead-of-cp">terminal-tutorials/rsync-instead-of-cp</a>.</p>
-      <pre><code># The first copy: rsync -a
+      <pre class="cmds"><code><span class="ch" id="ch-2"># The first copy: rsync -a</span>
 $ find photos -type f | sort
 photos/2026/a.jpg
 photos/2026/b.jpg
@@ -51,13 +50,13 @@ backup/cache/thumbs.tmp
 backup/notes.txt
 backup/old.txt
 
-# Only what changed: -i
+<span class="ch" id="ch-3"># Only what changed: -i</span>
 $ echo "Day 2: rain" &gt;&gt; photos/notes.txt &amp;&amp; rsync -ai photos/ backup/
 &gt;f.st...... notes.txt
 $ rsync -ai photos/ backup/ &amp;&amp; echo "nothing to copy"
 nothing to copy
 
-# Deletions: dry run first
+<span class="ch" id="ch-4"># Deletions: dry run first</span>
 $ rm photos/old.txt &amp;&amp; rsync -ai photos/ backup/ &amp;&amp; ls backup
 .d..t...... ./
 2026
@@ -77,7 +76,7 @@ $ rsync -ai --delete photos/ backup/ &amp;&amp; ls backup
 cache
 notes.txt
 
-# The trailing-slash trap
+<span class="ch" id="ch-5"># The trailing-slash trap</span>
 $ rsync -a photos/ copy1/ &amp;&amp; ls copy1
 2026
 cache
@@ -85,7 +84,7 @@ notes.txt
 $ rsync -a photos copy2/ &amp;&amp; ls copy2
 photos
 
-# Skip files with --exclude
+<span class="ch" id="ch-6"># Skip files with --exclude</span>
 $ rsync -ai --delete --exclude='*.tmp' --exclude=cache/ photos/ clean/
 created directory clean
 cd+++++++++ ./
@@ -99,13 +98,33 @@ clean/2026/a.jpg
 clean/2026/b.jpg
 clean/2026/c.jpg
 clean/notes.txt</code></pre>
-    </section>
-    <section class="quiz" id="quiz">
-      <h2>Quick check</h2>
-      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
-      <div id="quiz-root"></div>
-    </section>
-  </div>
+  </section>
+  <section class="quiz" id="quiz">
+      <h2>Quiz</h2>
+      <p class="sub">10 questions: 2 from the video and 8 new ones. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+  <section id="practice">
+    <h2>Practice</h2>
+    <p class="sub">Do it yourself, without the video. Download the <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/rsync-instead-of-cp/practice">practice folder</a> and run <code>sh start.sh</code> — it opens a throwaway container (podman or docker), nothing touches your system.</p>
+    <pre><code>PRACTICE — lesson 12: rsync instead of cp
+-----------------------------------------
+/work/docs holds a team's documents. /work/mirror is a copy of it
+from last week: since then a file changed, one was added and two
+were deleted. Editor swap files (*.swp) and the .cache folder must
+never go into the mirror. Don't change anything inside /work/docs.
+
+1. First a preview: save the rsync dry run (one line per change,
+   deletions included) to /work/preview.txt. The mirror must not
+   change yet. It should list the two deleted files.
+2. Now make /work/mirror match /work/docs for real: same files,
+   same modification times, the deleted files removed, no *.swp,
+   no .cache. Careful with the slash: the files belong directly in
+   /work/mirror, not in /work/mirror/docs.
+
+Check: sh /practice/check.sh     Answer: /practice/solution.md</code></pre>
+    <p class="sub">Inside, <code>sh check.sh</code> tells you when you are done. Stuck? <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/rsync-instead-of-cp/practice/solution.md">solution.md</a> — but try first.</p>
+  </section>
 
   <section>
     <div class="note">
@@ -120,39 +139,22 @@ clean/notes.txt</code></pre>
   <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
 </div></footer>
 
-<script id="quiz-data" type="application/json">[{"type": "choice", "q": "Which command copies only the contents of photos into backup: rsync -a photos backup/ or rsync -a photos/ backup/?", "opts": ["rsync -a photos backup/", "rsync -a photos/ backup/"], "a": 1, "expl": "The slash after the source means its contents. Without it, you get backup slash photos."}, {"type": "choice", "q": "Before running rsync with --delete for the first time, what should you add?", "opts": ["-v", "-n (a dry run)", "--force"], "a": 1, "expl": "-n shows every deletion and changes nothing. Run for real only when the list looks right."}]</script>
+<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "Which command copies only the contents of photos into backup: rsync -a photos backup/ or rsync -a photos/ backup/?", "expl": "The slash after the source means its contents. Without it, you get backup slash photos.", "ch": "The trailing-slash trap", "anchor": "ch-5", "t": 133, "opts": ["rsync -a photos backup/", "rsync -a photos/ backup/", "Both do the same"], "a": 1}, {"type": "choice", "kind": "video", "q": "Before running rsync with --delete for the first time, what should you add?", "expl": "-n shows every deletion and changes nothing. Run for real only when the list looks right.", "ch": "Deletions: dry run first", "anchor": "ch-4", "t": 91, "opts": ["-v", "-n (a dry run)", "--force"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "Type an `rsync` command that copies the contents of `photos` into `/tmp/q03/` in archive mode and prints one line for every file it transfers.", "expl": "`-a` is archive mode and `-i` itemizes the changes; the slash after `photos` copies its contents, not the folder.", "ch": "Only what changed: -i", "anchor": "ch-3", "t": 59, "answers": ["rsync -ai photos/ /tmp/q03/", "rsync -ia photos/ /tmp/q03/", "rsync -a -i photos/ /tmp/q03/", "rsync -ai photos/ /tmp/q03", "rsync --archive --itemize-changes photos/ /tmp/q03/"]}, {"type": "cmd", "kind": "cmd", "q": "`old.txt` was deleted from `photos`. Type the `rsync` command that only previews (changes nothing) what it would delete in `backup/` to match `photos/`, with one line per change.", "expl": "`-n` (`--dry-run`) only shows what would happen, so `old.txt` is still in the backup afterwards.", "ch": "Deletions: dry run first", "anchor": "ch-4", "t": 91, "answers": ["rsync -ain --delete photos/ backup/", "rsync -ani --delete photos/ backup/", "rsync -a -i -n --delete photos/ backup/", "rsync -ai --dry-run --delete photos/ backup/", "rsync -ain --delete photos/ backup"]}, {"type": "choice", "kind": "output", "q": "`backup` is an up-to-date copy of `photos`. Then `echo \"Day 2: rain\" >> photos/notes.txt`. What does this print?", "expl": "Only the changed file is sent: `f` for file, `s` for size, `t` for time. The pictures didn't change, so rsync skips them.", "ch": "Only what changed: -i", "anchor": "ch-3", "t": 59, "opts": [">f+++++++++ notes.txt\\n>f+++++++++ old.txt", ">f.st...... notes.txt", "(nothing)"], "a": 1, "show": "cd /tmp/q05 && rsync -ai photos/ backup/"}, {"type": "choice", "kind": "trap", "q": "`copy2` was made with `rsync -a photos copy2/` (no slash). Now you run `rsync -a --delete photos/ copy2/` (with the slash). What happens?", "expl": "With the slash rsync syncs the contents, so `copy2/photos` doesn't exist in the source and `--delete` removes it. Dry-run first with `-n`.", "ch": "The trailing-slash trap", "anchor": "ch-5", "t": 133, "opts": ["Nothing, the copy is already up to date", "Only new files are copied, `copy2/photos` stays", "`copy2/photos` is deleted and the files are copied straight into `copy2`"], "a": 2}, {"type": "choice", "kind": "choice", "q": "Does the slash after the destination matter: `rsync -a photos/ copy` vs `rsync -a photos/ copy/`?", "expl": "The destination is a folder either way. Only the source slash decides \"the folder\" vs \"its contents\".", "ch": "The trailing-slash trap", "anchor": "ch-5", "t": 133, "opts": ["No, only the slash after the source changes the result", "Yes, without it rsync creates a single file named `copy`", "Yes, without it you get `copy/photos`"], "a": 0}, {"type": "choice", "kind": "choice", "q": "What does `rsync -a` keep that a plain `cp -r` doesn't?", "expl": "`-a` is archive mode: recursive, and it keeps times and permissions. That's why the next run can skip unchanged files.", "ch": "The first copy: rsync -a", "anchor": "ch-2", "t": 32, "opts": ["Only the file names", "The modification times and permissions", "Nothing, it just compresses the files"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "Type an `rsync` command that copies the contents of `photos` into `/tmp/q09/` in archive mode, but skips every `*.tmp` file.", "expl": "`--exclude` takes a pattern; the quotes stop the shell from expanding the star before rsync sees it.", "ch": "Skip files with --exclude", "anchor": "ch-6", "t": 169, "answers": ["rsync -a --exclude='*.tmp' photos/ /tmp/q09/", "rsync -a --exclude=\"*.tmp\" photos/ /tmp/q09/", "rsync -a --exclude '*.tmp' photos/ /tmp/q09/", "rsync -a photos/ /tmp/q09/ --exclude='*.tmp'"]}, {"type": "choice", "kind": "choice", "q": "In the `-i` line `>f.st...... notes.txt`, what do `s` and `t` mean?", "expl": "rsync compares size and time to decide what to send; the letters show which of them changed.", "ch": "Only what changed: -i", "anchor": "ch-3", "t": 59, "opts": ["It was sent securely (s) over TCP (t)", "Its size (s) and modification time (t) differ from the copy", "It is small (s) and a text file (t)"], "a": 1}]</script>
+<script src="../../sp.js"></script>
 <script>
 (function(){
   // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
   var v=document.getElementById('video'), id=v.getAttribute('data-yt');
-  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
-
+  function embed(t,play){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+(t!=null?'?start='+t+(play?'&autoplay=1':''):'')+'" title="Lesson video" allow="encrypted-media; picture-in-picture; autoplay" allowfullscreen loading="lazy"></iframe>'; }
+  if(id){ embed(); }
   var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
-  var root=document.getElementById('quiz-root');
-  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
-  qs.forEach(function(q,i){
-    var box=document.createElement('div'); box.className='q';
-    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
-    var fb=document.createElement('p'); fb.className='fb';
-    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
-    if(q.type==='choice'){
-      var opts=document.createElement('div'); opts.className='opts';
-      q.opts.forEach(function(o,j){
-        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
-        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
-        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
-      });
-      box.appendChild(opts);
-    } else {
-      var row=document.createElement('div'); row.className='row';
-      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
-      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
-      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
-      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
-      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
-    }
-    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
-  });
+  if(!window.SP||!qs.length) return;
+  SP.quiz({root:document.getElementById('quiz-root'), questions:qs, id:'rsync-instead-of-cp', review:function(q){
+    var out=[];
+    if(id&&q.t!=null) out.push({href:'#video', text:'▶ video at '+SP.fmtT(q.t), onclick:function(e){ e.preventDefault(); embed(q.t,true); v.scrollIntoView({behavior:'smooth'}); }});
+    if(q.anchor) out.push({href:'#'+q.anchor, text:'commands: '+q.ch});
+    return out;
+  }});
 })();
 </script>
 </body>
