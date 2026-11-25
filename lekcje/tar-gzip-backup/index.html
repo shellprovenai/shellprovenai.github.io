@@ -16,7 +16,7 @@
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
-  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/tar-gzip-backup" class="hide-s">Commands</a></nav>
+  <nav class="nav"><a href="../">All lessons</a><a href="../../quiz/">Test yourself</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/tar-gzip-backup" class="hide-s">Commands</a></nav>
 </div></header>
 
 <main class="wrap">
@@ -30,11 +30,10 @@
     <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
   </div>
 
-  <div class="two">
-    <section>
+  <section>
       <h2>Commands</h2>
       <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/tar-gzip-backup">terminal-tutorials/tar-gzip-backup</a>.</p>
-      <pre><code># The project folder
+      <pre class="cmds"><code><span class="ch" id="ch-2"># The project folder</span>
 $ find project -type f | sort
 project/README.md
 project/logs/app.log
@@ -44,7 +43,7 @@ project/src/config.ini
 $ du -sh project
 8.1M	project
 
-# Create an archive and look inside
+<span class="ch" id="ch-3"># Create an archive and look inside</span>
 $ tar -czf backup.tgz project
 $ ls -lh backup.tgz
 -rw-r--r-- 1 root root 8.1M Nov 21 20:16 backup.tgz
@@ -60,7 +59,7 @@ project/logs/
 project/logs/app.log
 project/README.md
 
-# The trap: absolute paths
+<span class="ch" id="ch-4"># The trap: absolute paths</span>
 $ tar -czf abs.tgz /lab/work/project
 tar: Removing leading `/' from member names
 $ tar -tzf abs.tgz | head -3
@@ -77,7 +76,7 @@ project/
 project/src/
 project/src/app.py
 
-# Skip the junk with --exclude
+<span class="ch" id="ch-5"># Skip the junk with --exclude</span>
 $ tar -czf small.tgz --exclude=node_modules --exclude='*.log' -C /lab/work project
 $ tar -tzf small.tgz
 project/
@@ -90,7 +89,7 @@ $ ls -lh good.tgz small.tgz
 -rw-r--r-- 1 root root 8.1M Nov 21 20:16 good.tgz
 -rw-r--r-- 1 root root  282 Nov 21 20:16 small.tgz
 
-# Verify the backup
+<span class="ch" id="ch-6"># Verify the backup</span>
 $ gzip -t small.tgz &amp;&amp; echo "gzip OK"
 gzip OK
 $ tar -dzf small.tgz -C /lab/work &amp;&amp; echo "archive matches the disk"
@@ -100,16 +99,35 @@ project/src/config.ini: Mod time differs
 project/src/config.ini: Size differs
 $ printf 'debug = false\n' &gt; project/src/config.ini &amp;&amp; tar -czf small.tgz --exclude=node_modules --exclude='*.log' -C /lab/work project
 
-# Restore one file
+<span class="ch" id="ch-7"># Restore one file</span>
 $ mkdir /tmp/one &amp;&amp; tar -xzf small.tgz -C /tmp/one project/src/config.ini &amp;&amp; find /tmp/one -type f
 /tmp/one/project/src/config.ini</code></pre>
-    </section>
-    <section class="quiz" id="quiz">
-      <h2>Quick check</h2>
-      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
-      <div id="quiz-root"></div>
-    </section>
-  </div>
+  </section>
+  <section class="quiz" id="quiz">
+      <h2>Quiz</h2>
+      <p class="sub">10 questions: 2 from the video and 8 new ones. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+  <section id="practice">
+    <h2>Practice</h2>
+    <p class="sub">Do it yourself, without the video. Download the <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/tar-gzip-backup/practice">practice folder</a> and run <code>sh start.sh</code> — it opens a throwaway container (podman or docker), nothing touches your system.</p>
+    <pre><code>PRACTICE — lesson 11: tar and gzip without the usual mistakes
+-------------------------------------------------------------
+/work/sites/blog is a small blog. cache/ is 3 MB of generated
+pages, and the *.tmp files are editor leftovers.
+/work/old-backup.tgz is an older backup of the blog.
+
+1. Create /work/blog.tgz (tar + gzip) with the blog, but without
+   the cache folder and without any *.tmp file. Paths inside the
+   archive must start with blog/ (not work/sites/blog/).
+2. posts/hello.md was broken by a bad edit. Restore ONLY that file
+   from /work/old-backup.tgz. Everything else in the blog must
+   stay as it is: about.md is newer than the backup, keep it.
+   List the old archive first: how are its paths stored?
+
+Check: sh /practice/check.sh     Answer: /practice/solution.md</code></pre>
+    <p class="sub">Inside, <code>sh check.sh</code> tells you when you are done. Stuck? <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/tar-gzip-backup/practice/solution.md">solution.md</a> — but try first.</p>
+  </section>
 
   <section>
     <div class="note">
@@ -124,39 +142,22 @@ $ mkdir /tmp/one &amp;&amp; tar -xzf small.tgz -C /tmp/one project/src/config.in
   <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
 </div></footer>
 
-<script id="quiz-data" type="application/json">[{"type": "choice", "q": "I archived /lab/work/project by its full path and extracted it in /tmp/restore. Where are my files?", "opts": ["/tmp/restore/project", "/tmp/restore/lab/work/project", "Back in /lab/work/project"], "a": 1, "expl": "Tar keeps the whole path, minus the leading slash. Use -C with the parent folder to get short paths."}, {"type": "choice", "q": "How can I prove an archive still matches the files on disk?", "opts": ["gzip -t small.tgz", "tar -dzf small.tgz -C /lab/work", "ls -lh small.tgz"], "a": 1, "expl": "gzip -t only checks the compression. tar -d compares every file, and prints nothing when they match."}]</script>
+<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "I archived /lab/work/project by its full path and extracted it in /tmp/restore. Where are my files?", "expl": "Tar keeps the whole path, minus the leading slash. Use -C with the parent folder to get short paths.", "ch": "The trap: absolute paths", "anchor": "ch-4", "t": 81, "opts": ["/tmp/restore/project", "/tmp/restore/lab/work/project", "Back in /lab/work/project"], "a": 1}, {"type": "choice", "kind": "video", "q": "How can I prove an archive still matches the files on disk?", "expl": "gzip -t only checks the compression. tar -d compares every file, and prints nothing when they match.", "ch": "Verify the backup", "anchor": "ch-6", "t": 160, "opts": ["gzip -t small.tgz", "tar -dzf small.tgz -C /lab/work", "ls -lh small.tgz"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "You can be in any folder. Type a `tar` command that creates `/tmp/backup.tgz` from `/lab/work/project` with short paths that start with `project/`.", "expl": "`-C /lab/work` changes into the parent folder first, so the archive stores `project/...` instead of `lab/work/project/...`.", "ch": "The trap: absolute paths", "anchor": "ch-4", "t": 81, "answers": ["tar -czf /tmp/backup.tgz -C /lab/work project", "tar -C /lab/work -czf /tmp/backup.tgz project", "tar -zcf /tmp/backup.tgz -C /lab/work project", "tar czf /tmp/backup.tgz -C /lab/work project"]}, {"type": "choice", "kind": "trap", "q": "tar printed the warning \"Removing leading '/' from member names\". Later you extract that archive with `tar -xzf` inside an empty folder `/tmp/x`. What happens to the original folder?", "expl": "Removing the slash makes the paths relative, so extracting is safe; you just get the files several folders deep.", "ch": "The trap: absolute paths", "anchor": "ch-4", "t": 81, "opts": ["It's overwritten with the archived copies", "Nothing: the files land in `/tmp/x/...` with the full path inside", "tar refuses to extract an archive made from an absolute path"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "Type the command that lists what's inside `small.tgz`, without extracting anything.", "expl": "`-t` lists the contents. GNU tar also detects gzip by itself when reading, so `-tf` works too.", "ch": "Create an archive and look inside", "anchor": "ch-3", "t": 51, "answers": ["tar -tzf small.tgz", "tar -ztf small.tgz", "tar tzf small.tgz", "tar -tf small.tgz", "tar --list -zf small.tgz"]}, {"type": "choice", "kind": "output", "q": "`small.tgz` was made with `--exclude=node_modules --exclude='*.log'`. What does this print?", "expl": "`'*.log'` skips the log file, but the empty `logs/` folder is still stored. `node_modules` is gone completely.", "ch": "Skip the junk with --exclude", "anchor": "ch-5", "t": 130, "opts": ["project/\\nproject/README.md\\nproject/src/\\nproject/src/app.py\\nproject/src/config.ini", "project/\\nproject/README.md\\nproject/logs/\\nproject/src/\\nproject/src/app.py\\nproject/src/config.ini", "project/\\nproject/README.md\\nproject/logs/\\nproject/logs/app.log\\nproject/src/\\nproject/src/app.py\\nproject/src/config.ini"], "a": 1, "show": "tar -tzf small.tgz | sort"}, {"type": "choice", "kind": "choice", "q": "You type `tar -cfz backup.tgz project`. What happens?", "expl": "The `f` option takes the next word as the archive name. Keep `f` last: `-czf backup.tgz`.", "ch": "Create an archive and look inside", "anchor": "ch-3", "t": 51, "opts": ["The same as `tar -czf backup.tgz project`", "tar writes to a file named `z`, because the file name must come right after `f`", "tar creates `backup.tgz` without compression"], "a": 1}, {"type": "choice", "kind": "output", "q": "After the backup, `config.ini` was changed from `debug = false` to `debug = true` (and saved later). What does this print?", "expl": "tar names the file and says what differs. Here the new text is one byte longer, so the size changed as well as the time.", "ch": "Verify the backup", "anchor": "ch-6", "t": 160, "opts": ["Nothing, the archive is still valid", "project/src/config.ini: Mod time differs\\nproject/src/config.ini: Size differs", "project/src/config.ini: Contents differ"], "a": 1, "show": "tar -dzf /tmp/q08/s.tgz -C /tmp/q08"}, {"type": "cmd", "kind": "cmd", "q": "`/tmp/one` is an empty folder. Type a command that extracts only `project/README.md` from `small.tgz` into it.", "expl": "Give the path exactly as `tar -t` lists it, and tar extracts only that file.", "ch": "Restore one file", "anchor": "ch-7", "t": 192, "answers": ["tar -xzf small.tgz -C /tmp/one project/README.md", "tar -C /tmp/one -xzf small.tgz project/README.md", "tar -xf small.tgz -C /tmp/one project/README.md"]}, {"type": "choice", "kind": "choice", "q": "What does `-C /lab/work` do in `tar -czf good.tgz -C /lab/work project`?", "expl": "`-C` is \"change directory\". The archive is still written where you named it, here `good.tgz` in the current folder.", "ch": "The trap: absolute paths", "anchor": "ch-4", "t": 81, "opts": ["It compresses the archive more strongly", "tar changes into `/lab/work` first, so the archive stores paths starting with `project/`", "It copies the finished archive into `/lab/work`"], "a": 1}]</script>
+<script src="../../sp.js"></script>
 <script>
 (function(){
   // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
   var v=document.getElementById('video'), id=v.getAttribute('data-yt');
-  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
-
+  function embed(t,play){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+(t!=null?'?start='+t+(play?'&autoplay=1':''):'')+'" title="Lesson video" allow="encrypted-media; picture-in-picture; autoplay" allowfullscreen loading="lazy"></iframe>'; }
+  if(id){ embed(); }
   var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
-  var root=document.getElementById('quiz-root');
-  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
-  qs.forEach(function(q,i){
-    var box=document.createElement('div'); box.className='q';
-    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
-    var fb=document.createElement('p'); fb.className='fb';
-    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
-    if(q.type==='choice'){
-      var opts=document.createElement('div'); opts.className='opts';
-      q.opts.forEach(function(o,j){
-        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
-        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
-        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
-      });
-      box.appendChild(opts);
-    } else {
-      var row=document.createElement('div'); row.className='row';
-      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
-      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
-      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
-      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
-      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
-    }
-    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
-  });
+  if(!window.SP||!qs.length) return;
+  SP.quiz({root:document.getElementById('quiz-root'), questions:qs, id:'tar-gzip-backup', review:function(q){
+    var out=[];
+    if(id&&q.t!=null) out.push({href:'#video', text:'▶ video at '+SP.fmtT(q.t), onclick:function(e){ e.preventDefault(); embed(q.t,true); v.scrollIntoView({behavior:'smooth'}); }});
+    if(q.anchor) out.push({href:'#'+q.anchor, text:'commands: '+q.ch});
+    return out;
+  }});
 })();
 </script>
 </body>
