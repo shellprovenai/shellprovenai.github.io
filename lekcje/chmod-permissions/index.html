@@ -16,7 +16,7 @@
 <body>
 <header class="top"><div class="wrap">
   <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
-  <nav class="nav"><a href="../">All lessons</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/chmod-permissions" class="hide-s">Commands</a></nav>
+  <nav class="nav"><a href="../">All lessons</a><a href="../../quiz/">Test yourself</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/chmod-permissions" class="hide-s">Commands</a></nav>
 </div></header>
 
 <main class="wrap">
@@ -30,11 +30,10 @@
     <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
   </div>
 
-  <div class="two">
-    <section>
+  <section>
       <h2>Commands</h2>
       <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/chmod-permissions">terminal-tutorials/chmod-permissions</a>.</p>
-      <pre><code># Reading ls -l
+      <pre class="cmds"><code><span class="ch" id="ch-2"># Reading ls -l</span>
 $ ls -l
 total 16
 -rw-r--r-- 1 alice web   24 Nov 21 19:15 deploy.sh
@@ -42,14 +41,14 @@ total 16
 drwxr-xr-x 2 alice web 4096 Nov 21 19:15 private
 -rw-r--r-- 1 alice web   17 Nov 21 19:15 secret.env
 
-# From letters to numbers
+<span class="ch" id="ch-3"># From letters to numbers</span>
 $ stat -c '%A %a %U:%G %n' *
 -rw-r--r-- 644 alice:web deploy.sh
 -rw-r--r-- 644 alice:web index.html
 drwxr-xr-x 755 alice:web private
 -rw-r--r-- 644 alice:web secret.env
 
-# Problem 1: the script won't run
+<span class="ch" id="ch-4"># Problem 1: the script won't run</span>
 $ su alice -c ./deploy.sh
 sh: 1: ./deploy.sh: Permission denied
 $ chmod u+x deploy.sh &amp;&amp; su alice -c ./deploy.sh
@@ -57,19 +56,19 @@ deployed
 $ chmod go-w,g+x deploy.sh &amp;&amp; stat -c '%A %a %n' deploy.sh
 -rwxr-xr-- 754 deploy.sh
 
-# Problem 2: a secret anyone can read
+<span class="ch" id="ch-5"># Problem 2: a secret anyone can read</span>
 $ su bob -c 'cat secret.env'
 DB_PASSWORD=demo
 $ chmod 600 secret.env &amp;&amp; su bob -c 'cat secret.env'
 cat: secret.env: Permission denied
 
-# Problem 3: a private folder
+<span class="ch" id="ch-6"># Problem 3: a private folder</span>
 $ chmod 750 private &amp;&amp; su bob -c 'ls private'
 ls: cannot open directory 'private': Permission denied
 $ ls -ld private
 drwxr-x--- 2 alice web 4096 Nov 21 19:15 private
 
-# Why chmod 777 is a bad fix
+<span class="ch" id="ch-7"># Why chmod 777 is a bad fix</span>
 $ chmod 777 index.html &amp;&amp; su bob -c 'echo defaced &gt; index.html' &amp;&amp; cat index.html
 defaced
 $ find . -perm -o=w -type f
@@ -77,16 +76,34 @@ $ find . -perm -o=w -type f
 $ chmod 644 index.html &amp;&amp; su bob -c 'echo again &gt; index.html'
 sh: 1: cannot create index.html: Permission denied
 
-# Changing the owner with chown
+<span class="ch" id="ch-8"># Changing the owner with chown</span>
 $ chown bob:web index.html &amp;&amp; ls -l index.html
 -rw-r--r-- 1 bob web 8 Nov 21 19:15 index.html</code></pre>
-    </section>
-    <section class="quiz" id="quiz">
-      <h2>Quick check</h2>
-      <p class="sub">Same two questions as in the video. Checked here, in your browser — nothing is sent anywhere.</p>
-      <div id="quiz-root"></div>
-    </section>
-  </div>
+  </section>
+  <section class="quiz" id="quiz">
+      <h2>Quiz</h2>
+      <p class="sub">10 questions: 2 from the video and 8 new ones. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+  <section id="practice">
+    <h2>Practice</h2>
+    <p class="sub">Do it yourself, without the video. Download the <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/chmod-permissions/practice">practice folder</a> and run <code>sh start.sh</code> — it opens a throwaway container (podman or docker), nothing touches your system.</p>
+    <pre><code>PRACTICE — lesson 04: fix permissions without 777
+-------------------------------------------------
+/work/app belongs to dave and the group devs. erin is in devs,
+mallory is not. Someone "fixed" a Permission denied with chmod 777
+on a few files. Don't change any owner, and don't delete files:
+
+1. Write the regular files in /work/app that everyone (others) can
+   write to /work/writable.txt, one per line, sorted, like
+   ./index.php. Then fix them: run.sh gets 755, the others 644.
+2. Lock up the secrets: only dave may read and write db.env, and
+   the folder private must let dave do everything, let the devs
+   group list it and open notes.txt, and keep mallory out.
+
+Check: sh /practice/check.sh     Answer: /practice/solution.md</code></pre>
+    <p class="sub">Inside, <code>sh check.sh</code> tells you when you are done. Stuck? <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/chmod-permissions/practice/solution.md">solution.md</a> — but try first.</p>
+  </section>
 
   <section>
     <div class="note">
@@ -101,39 +118,22 @@ $ chown bob:web index.html &amp;&amp; ls -l index.html
   <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
 </div></footer>
 
-<script id="quiz-data" type="application/json">[{"type": "choice", "q": "Alice owns deploy.sh, but running it says Permission denied. Is the fix chmod 777 or chmod u+x?", "opts": ["chmod 777 deploy.sh", "chmod u+x deploy.sh", "chown alice deploy.sh"], "a": 1, "expl": "Only the execute bit was missing. Seven seven seven would let every user on the system change the script."}, {"type": "choice", "q": "Which mode lets only the owner read and write a password file?", "opts": ["644", "600", "755"], "a": 1, "expl": "Six hundred: read and write for the owner, nothing for the group or anyone else."}]</script>
+<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "Alice owns deploy.sh, but running it says Permission denied. Is the fix chmod 777 or chmod u+x?", "expl": "Only the execute bit was missing. Seven seven seven would let every user on the system change the script.", "ch": "Problem 1: the script won't run", "anchor": "ch-4", "t": 106, "opts": ["chmod 777 deploy.sh", "chmod u+x deploy.sh", "chown alice deploy.sh"], "a": 1}, {"type": "choice", "kind": "video", "q": "Which mode lets only the owner read and write a password file?", "expl": "Six hundred: read and write for the owner, nothing for the group or anyone else.", "ch": "Problem 2: a secret anyone can read", "anchor": "ch-5", "t": 133, "opts": ["644", "600", "755"], "a": 1}, {"type": "choice", "kind": "choice", "q": "`ls -l` shows `-rw-r--r-- 1 alice web 6 index.html`. What may members of the group `web` do with the file?", "expl": "The middle three letters `r--` belong to the group: read, no write, no execute.", "ch": "Reading ls -l", "anchor": "ch-2", "t": 30, "opts": ["Read and write it", "Only read it", "Nothing, only alice may open it"], "a": 1}, {"type": "choice", "kind": "output", "q": "`deploy.sh` starts as `-rw-r--r--` (644). What does this print?", "expl": "Owner gets x (rwx = 7), the group gets x (r-x = 5), others stay read-only (r-- = 4). Removing write that isn't there changes nothing.", "ch": "From letters to numbers", "anchor": "ch-3", "t": 71, "opts": ["-rwxr-xr-x 755", "-rwxr-xr-- 754", "-rwxrw-r-- 764"], "a": 1, "show": "chmod u+x,go-w,g+x deploy.sh && stat -c '%A %a' deploy.sh"}, {"type": "cmd", "kind": "cmd", "q": "Type a `chmod` command for the folder `private`: full access for the owner, the group may list and enter it, everyone else gets nothing.", "expl": "`750` = rwx for the owner, r-x for the group, nothing for others. Starting from 755, `o-rwx` gives the same result.", "ch": "Problem 3: a private folder", "anchor": "ch-6", "t": 159, "answers": ["chmod 750 private", "chmod 0750 private", "chmod u=rwx,g=rx,o= private", "chmod o-rwx private"]}, {"type": "choice", "kind": "choice", "q": "The folder `private` has mode 744 (`drwxr--r--`). Can a member of its group read `private/notes.txt`?", "expl": "On a folder, `r` lets you list the names and `x` lets you go inside. Opening a file in it needs `x`.", "ch": "Problem 3: a private folder", "anchor": "ch-6", "t": 159, "opts": ["Yes, `r` on the folder is enough", "No: without `x` the group can't enter the folder", "Only if `notes.txt` is 777"], "a": 1}, {"type": "choice", "kind": "trap", "q": "You \"fix\" a Permission denied on `index.html` with `chmod 777`. What is the real problem with that?", "expl": "The last 7 gives everyone read, write and execute. Bob, who has nothing to do with the site, can replace the page.", "ch": "Why chmod 777 is a bad fix", "anchor": "ch-7", "t": 183, "opts": ["Only root can read the file afterwards", "Every user on the system, like bob, can now overwrite the file", "Nothing, 777 only adds the execute bit"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "Type a `find` command that lists the regular files (`-type f`) in the current folder that everyone (others) can write.", "expl": "`-perm -o=w` means “at least the write bit for others”. Without the dash, find wants exactly that mode and finds nothing.", "ch": "Why chmod 777 is a bad fix", "anchor": "ch-7", "t": 183, "answers": ["find . -perm -o=w -type f", "find . -type f -perm -o=w", "find . -type f -perm -002", "find . -type f -perm /o=w"]}, {"type": "cmd", "kind": "cmd", "q": "`index.html` belongs to `alice:root`. Type one command that makes bob the owner and `web` the group.", "expl": "`chown user:group file` changes both at once; with only a user name, the group stays as it was.", "ch": "Changing the owner with chown", "anchor": "ch-8", "t": 221, "answers": ["chown bob:web index.html", "chown bob:web ./index.html"]}, {"type": "choice", "kind": "choice", "q": "Alice owns `index.html`. Can she give it to bob with `chown bob index.html`?", "expl": "Only root may change a file's owner, so on a normal system you put sudo in front of chown.", "ch": "Changing the owner with chown", "anchor": "ch-8", "t": 221, "opts": ["Yes, the owner may give her files away", "Yes, if bob is in the same group", "No: changing the owner needs root, which is why you'd use sudo"], "a": 2}]</script>
+<script src="../../sp.js"></script>
 <script>
 (function(){
   // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
   var v=document.getElementById('video'), id=v.getAttribute('data-yt');
-  if(id){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Lesson video" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>'; }
-
+  function embed(t,play){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+(t!=null?'?start='+t+(play?'&autoplay=1':''):'')+'" title="Lesson video" allow="encrypted-media; picture-in-picture; autoplay" allowfullscreen loading="lazy"></iframe>'; }
+  if(id){ embed(); }
   var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
-  var root=document.getElementById('quiz-root');
-  var norm=function(s){ return s.trim().replace(/\s+/g,' ').replace(/^\$\s*/,''); };
-  qs.forEach(function(q,i){
-    var box=document.createElement('div'); box.className='q';
-    var h=document.createElement('h3'); h.textContent=(i+1)+'. '+q.q; box.appendChild(h);
-    var fb=document.createElement('p'); fb.className='fb';
-    var ex=document.createElement('p'); ex.className='expl'; ex.hidden=true; ex.textContent=q.expl||'';
-    if(q.type==='choice'){
-      var opts=document.createElement('div'); opts.className='opts';
-      q.opts.forEach(function(o,j){
-        var l=document.createElement('label'), r=document.createElement('input'); r.type='radio'; r.name='q'+i; r.value=j;
-        r.addEventListener('change',function(){ var ok=(j===q.a); fb.textContent=ok?'Correct.':'Not quite — try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} });
-        l.appendChild(r); l.appendChild(document.createTextNode(' '+o)); opts.appendChild(l);
-      });
-      box.appendChild(opts);
-    } else {
-      var row=document.createElement('div'); row.className='row';
-      var inp=document.createElement('input'); inp.type='text'; inp.placeholder='type the command…'; inp.autocomplete='off'; inp.spellcheck=false;
-      var b=document.createElement('button'); b.className='btn'; b.textContent='Check';
-      var check=function(){ var val=norm(inp.value); var ok=(q.answers||[]).some(function(a){return norm(a)===val;}); fb.textContent=ok?'Correct.':'Not quite — compare with the lesson and try again.'; fb.className='fb '+(ok?'ok':'bad'); if(ok){ex.hidden=false;} };
-      b.addEventListener('click',check); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){check();} });
-      box.appendChild(inp); row.appendChild(b); box.appendChild(row);
-    }
-    box.appendChild(fb); box.appendChild(ex); root.appendChild(box);
-  });
+  if(!window.SP||!qs.length) return;
+  SP.quiz({root:document.getElementById('quiz-root'), questions:qs, id:'chmod-permissions', review:function(q){
+    var out=[];
+    if(id&&q.t!=null) out.push({href:'#video', text:'▶ video at '+SP.fmtT(q.t), onclick:function(e){ e.preventDefault(); embed(q.t,true); v.scrollIntoView({behavior:'smooth'}); }});
+    if(q.anchor) out.push({href:'#'+q.anchor, text:'commands: '+q.ch});
+    return out;
+  }});
 })();
 </script>
 </body>
