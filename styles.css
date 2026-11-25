@@ -108,3 +108,30 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:14px 24px;justify-content:space-bet
 .quiz .fb.ok{color:var(--accent)} .quiz .fb.bad{color:#ff8a8a}
 .quiz .expl{color:var(--muted);font-size:.92rem;margin-top:6px}
 .steps li{margin:6px 0}
+
+/* quiz grade, progress, Test yourself (25.11) */
+.ch{display:inline-block;scroll-margin-top:76px;color:var(--accent)}
+#practice,#video,#quiz{scroll-margin-top:70px}
+.quiz .out{font-family:var(--mono);font-size:.88rem;white-space:pre-wrap}
+.quiz pre{margin:0 0 10px}
+.quiz-count{color:var(--muted);font-size:.9rem;margin:0 0 12px}
+.grade{background:var(--panel);border:1px solid var(--accent);border-radius:var(--radius);padding:20px;margin:6px 0 14px}
+.grade .g-label{font-size:1.5rem;font-weight:700;color:var(--accent)}
+.grade .g-score{font-family:var(--mono);color:var(--text);margin:2px 0 8px}
+.grade .g-text{margin:0 0 10px}
+.grade .g-sub{color:var(--muted);font-size:.92rem;margin:10px 0 6px}
+.grade .g-review{margin:0 0 6px;padding-left:20px}
+.grade .g-review li{margin:6px 0}
+.grade .g-review a{font-size:.9rem;white-space:nowrap}
+.grade.g-again{border-color:#ff8a8a} .grade.g-again .g-label{color:#ff8a8a}
+.grade.g-good{border-color:#e6c36a} .grade.g-good .g-label{color:#e6c36a}
+.progress{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin:0 0 18px}
+.progress .p-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;font-size:.95rem}
+.progress .p-quiz{color:var(--muted)}
+.progress .p-bar{height:8px;background:var(--panel-2);border-radius:99px;margin-top:10px;overflow:hidden}
+.progress .p-fill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .4s}
+.tag.best{color:var(--accent);border-color:var(--accent);margin-left:0}
+.lesson .tag.best{display:inline-block;margin-top:8px}
+.tag.best.g-again{color:#ff8a8a;border-color:#ff8a8a} .tag.best.g-good{color:#e6c36a;border-color:#e6c36a}
+pre.cmds{max-height:60vh}
+#quiz-root,.quiz>.sub{max-width:48rem}
