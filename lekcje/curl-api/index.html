@@ -85,8 +85,32 @@ request failed with 404</code></pre>
   </section>
   <section class="quiz" id="quiz">
       <h2>Quiz</h2>
-      <p class="sub">The two questions from the video. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <p class="sub">10 questions: 2 from the video and 8 new ones. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
       <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+  <section id="practice">
+    <h2>Practice</h2>
+    <p class="sub">Do it yourself, without the video. Download the <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/curl-api/practice">practice folder</a> and run <code>sh start.sh</code> — it opens a throwaway container (podman or docker), nothing touches your system.</p>
+    <pre><code>PRACTICE — lesson 20: curl for APIs
+-----------------------------------
+A small helpdesk API runs in this container on http://localhost:8080
+(test server, nothing leaves the container). The API key is in
+/work/api-key.txt; the API wants it in the header X-API-Key.
+
+1. Create a ticket with the title "disk full on web1": POST the JSON
+   {"title":"disk full on web1"} to http://localhost:8080/tickets.
+   Read the key from the file, don't type it into the command.
+   You should get status 201. Plain -d is not enough here!
+   (GET /tickets with the same header lists the tickets.)
+2. /work/backup-check.sh says "backup OK", but there is no backup of
+   db1 at all: the server answers 404. Fix the script so that on an
+   error answer it does NOT print "backup OK" and exits with a non-zero
+   code. For a real backup (try BACKUP_URL=http://localhost:8080/backups/web1
+   sh /work/backup-check.sh) it must still print "backup OK".
+
+Check: sh /practice/check.sh     Answer: /practice/solution.md
+Start over: sh /practice/setup.sh</code></pre>
+    <p class="sub">Inside, <code>sh check.sh</code> tells you when you are done. Stuck? <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/curl-api/practice/solution.md">solution.md</a> — but try first.</p>
   </section>
 
   <section>
@@ -102,7 +126,7 @@ request failed with 404</code></pre>
   <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
 </div></footer>
 
-<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "curl gets a 404 Not Found. What exit code does it return without -f?", "opts": ["0 — use -f or check %{http_code}", "22", "404"], "a": 0, "expl": "For curl, any answer is a success. -f turns error codes into exit code twenty-two.", "ch": "Quick check", "anchor": "ch-8", "t": null}, {"type": "choice", "kind": "video", "q": "How do I POST JSON so the server knows it is JSON?", "opts": ["-d '{...}' alone", "-H 'Content-Type: application/json' -d '{...}' (or --json)", "-X JSON '{...}'"], "a": 1, "expl": "Plain -d sends a form. The content type header, or --json, tells the server it's J S O N.", "ch": "Quick check", "anchor": "ch-8", "t": null}]</script>
+<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "curl gets a 404 Not Found. What exit code does it return without -f?", "expl": "For curl, any answer is a success, even an error answer. `-f` turns codes of 400 and above into exit code 22.", "ch": "Status codes and the exit code trap", "anchor": "ch-2", "t": 36, "opts": ["0 — use -f or check %{http_code}", "22", "404"], "a": 0}, {"type": "choice", "kind": "video", "q": "How do I POST JSON so the server knows it is JSON?", "expl": "Plain `-d` sends a form (`application/x-www-form-urlencoded`). The Content-Type header, or `--json`, tells the server it's JSON.", "ch": "POST a JSON body", "anchor": "ch-4", "t": 100, "opts": ["-d '{...}' alone", "-H 'Content-Type: application/json' -d '{...}' (or --json)", "-X JSON '{...}'"], "a": 1}, {"type": "choice", "kind": "trap", "q": "A deploy script runs `curl -s http://localhost:8000/nope && echo deployed`. The URL is wrong. What happens?", "expl": "curl got an answer, so it exits with 0 and `&&` carries on. Add `-f` (exit code 22 on errors) or check `%{http_code}`.", "ch": "Status codes and the exit code trap", "anchor": "ch-2", "t": 36, "opts": ["curl fails, so `deployed` is not printed", "The error body is printed, and then `deployed` too", "Nothing is printed at all"], "a": 1}, {"type": "choice", "kind": "choice", "q": "What does `-i` add to curl's output?", "expl": "`-i` includes the response head (status line and headers) in the output. The body still follows after an empty line.", "ch": "Status codes and the exit code trap", "anchor": "ch-2", "t": 36, "opts": ["Only the headers, without the body", "The status line and the response headers, before the body", "Case-insensitive matching of the URL"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "Type a curl command that lists the items from `http://localhost:8000/api/items`, sending the bearer token `demo-token` (use `-s`).", "expl": "`-H` adds a header: name, colon, value. Without the `Authorization` header the server answers 401.", "ch": "Send a header", "anchor": "ch-3", "t": 77, "answers": ["curl -s -H \"Authorization: Bearer demo-token\" http://localhost:8000/api/items", "curl -s -H 'Authorization: Bearer demo-token' http://localhost:8000/api/items", "curl -s --header \"Authorization: Bearer demo-token\" http://localhost:8000/api/items", "curl -H \"Authorization: Bearer demo-token\" -s http://localhost:8000/api/items", "curl -s -H \"Authorization: Bearer demo-token\" \"http://localhost:8000/api/items\""]}, {"type": "choice", "kind": "choice", "q": "`/api/items` answers 401 with `{\"error\": \"missing or wrong token\"}`. What fixes it?", "expl": "401 means \"who are you?\". `-f` only changes curl's exit code, and POST is a different request.", "ch": "Send a header", "anchor": "ch-3", "t": 77, "opts": ["Add `-f`", "Send the token in a header: `-H \"Authorization: Bearer <token>\"`", "Switch to `-X POST`"], "a": 1}, {"type": "choice", "kind": "output", "q": "What does this print?", "expl": "Plain `-d` sends the body as a form, so this server refuses it with 415 Unsupported Media Type. Add `-H 'Content-Type: application/json'` or use `--json`.", "ch": "POST a JSON body", "anchor": "ch-4", "t": 100, "opts": ["415", "201", "200"], "a": 0, "show": "curl -s -o /dev/null -w '%{http_code}\\n' -d '{\"name\":\"pen\"}' http://localhost:8000/api/items"}, {"type": "choice", "kind": "choice", "q": "Why does the timing command use `-o /dev/null` together with `-w`?", "expl": "`-o` writes the body to a file; `/dev/null` discards it. `-w` still prints after the request.", "ch": "Timings with -w", "anchor": "ch-5", "t": 126, "opts": ["It makes the request faster", "It throws the body away, so you see only the line printed by `-w`", "It hides errors from the server"], "a": 1}, {"type": "cmd", "kind": "cmd", "q": "You already logged in with `curl -s -c cookies.txt -X POST http://localhost:8000/login`. Type a curl command that calls `http://localhost:8000/me` as the logged-in user (use `-s`).", "expl": "`-c` saves the cookies the server sets; `-b` sends them back. Using `-c` alone writes the jar but sends nothing.", "ch": "Keep a session with cookies", "anchor": "ch-6", "t": 150, "answers": ["curl -s -b cookies.txt http://localhost:8000/me", "curl -s --cookie cookies.txt http://localhost:8000/me", "curl -b cookies.txt -s http://localhost:8000/me", "curl -s -b cookies.txt -c cookies.txt http://localhost:8000/me"]}, {"type": "cmd", "kind": "cmd", "q": "Type a curl command that prints only the HTTP status code of `http://localhost:8000/nope`, without the body (use `-s`).", "expl": "`-o /dev/null` drops the body and `-w '%{http_code}'` prints just the code, ready for `code=$(...)` in a script.", "ch": "Check the status code in a script", "anchor": "ch-7", "t": 166, "answers": ["curl -s -o /dev/null -w '%{http_code}' http://localhost:8000/nope", "curl -s -o /dev/null -w '%{http_code}\\n' http://localhost:8000/nope", "curl -s -o /dev/null -w \"%{http_code}\\n\" http://localhost:8000/nope", "curl -so /dev/null -w '%{http_code}' http://localhost:8000/nope", "curl -s -w '%{http_code}' -o /dev/null http://localhost:8000/nope"]}]</script>
 <script src="../../sp.js"></script>
 <script>
 (function(){
