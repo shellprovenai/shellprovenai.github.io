@@ -149,7 +149,7 @@
    "num": "17",
    "slug": "xargs-find-exec",
    "title": "xargs and find -exec done right: spaces in file names, -print0, and parallel jobs",
-   "youtube_id": "",
+   "youtube_id": "-vYIE_JQVow",
    "quiz": 10,
    "pool": 10,
    "practice": true
@@ -177,9 +177,9 @@
    "slug": "curl-api",
    "title": "curl for APIs: headers, JSON bodies, timings, cookies, and the status code trap in scripts",
    "youtube_id": "",
-   "quiz": 2,
-   "pool": 0,
-   "practice": false
+   "quiz": 10,
+   "pool": 10,
+   "practice": true
   }
  ]
 }
