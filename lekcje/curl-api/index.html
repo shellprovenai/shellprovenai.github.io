@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>curl for APIs: headers, JSON bodies, timings, cookies, and the status code trap in scripts — ShellProven</title>
+<meta name="description" content="Use curl against an HTTP API without surprises, on a small test server running locally in the container: read the status code and headers, see why curl exits with 0 on a 404 (and fix it with -f or -w), send an auth header, post a JSON body with the right Content-Type (or --json), measure timings with -w, keep a login session with a cookie jar, and check the status code in a script.">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="curl for APIs: headers, JSON bodies, timings, cookies, and the status code trap in scripts — ShellProven">
+<meta property="og:description" content="Use curl against an HTTP API without surprises, on a small test server running locally in the container: read the status code and headers, see why curl exits with 0 on a 404 (and fix it with -f or -w), send an auth header, post a JSON body with the right Content-Type (or --json), measure timings with -w, keep a login session with a cookie jar, and check the status code in a script.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="../../quiz/">Test yourself</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/curl-api" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 20 · tested on Debian 13</span>
+    <h1>curl for APIs: headers, JSON bodies, timings, cookies, and the status code trap in scripts</h1>
+    <p class="sub">Use curl against an HTTP API without surprises, on a small test server running locally in the container: read the status code and headers, see why curl exits with 0 on a 404 (and fix it with -f or -w), send an auth header, post a JSON body with the right Content-Type (or --json), measure timings with -w, keep a login session with a cookie jar, and check the status code in a script.</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/curl-api">terminal-tutorials/curl-api</a>.</p>
+      <pre class="cmds"><code><span class="ch" id="ch-2"># Status codes and the exit code trap</span>
+$ curl -s http://localhost:8000/health
+{"status": "ok"}
+$ curl -si http://localhost:8000/health
+HTTP/1.0 200 OK
+Server: BaseHTTP/0.6 Python/3.13.5
+Date: Sat, 21 Nov 2026 22:53:04 GMT
+Content-Type: application/json
+Content-Length: 17
+
+{"status": "ok"}
+$ curl -s http://localhost:8000/nope; echo "curl exit code: $?"
+{"error": "not found"}
+curl exit code: 0
+$ curl -sf http://localhost:8000/nope; echo "curl exit code: $?"
+curl exit code: 22
+
+<span class="ch" id="ch-3"># Send a header</span>
+$ curl -s -w ' -&gt; %{http_code}\n' http://localhost:8000/api/items
+{"error": "missing or wrong token"}
+ -&gt; 401
+$ curl -s -H "Authorization: Bearer demo-token" http://localhost:8000/api/items
+[{"id": 1, "name": "keyboard"}, {"id": 2, "name": "monitor"}]
+
+<span class="ch" id="ch-4"># POST a JSON body</span>
+$ curl -s -w ' -&gt; %{http_code}\n' -d '{"name":"cable"}' http://localhost:8000/api/items
+{"error": "expected Content-Type: application/json"}
+ -&gt; 415
+$ curl -s -w ' -&gt; %{http_code}\n' -H 'Content-Type: application/json' -d '{"name":"cable"}' http://localhost:8000/api/items
+{"id": 3, "name": "cable"}
+ -&gt; 201
+$ curl -s -w ' -&gt; %{http_code}\n' --json '{"name":"mouse"}' http://localhost:8000/api/items
+{"id": 4, "name": "mouse"}
+ -&gt; 201
+
+<span class="ch" id="ch-5"># Timings with -w</span>
+$ curl -s -o /dev/null -w 'status %{http_code}, connect %{time_connect}s, total %{time_total}s\n' http://localhost:8000/slow
+status 200, connect 0.000184s, total 0.401015s
+
+<span class="ch" id="ch-6"># Keep a session with cookies</span>
+$ curl -s -c cookies.txt -X POST http://localhost:8000/login
+{"logged_in": true}
+$ curl -s http://localhost:8000/me; curl -s -b cookies.txt http://localhost:8000/me
+{"error": "not logged in"}
+{"user": "demo"}
+
+<span class="ch" id="ch-7"># Check the status code in a script</span>
+$ code=$(curl -s -o /tmp/body.json -w '%{http_code}' http://localhost:8000/nope); if [ "$code" != 200 ]; then echo "request failed with $code"; fi
+request failed with 404</code></pre>
+  </section>
+  <section class="quiz" id="quiz">
+      <h2>Quiz</h2>
+      <p class="sub">The two questions from the video. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "curl gets a 404 Not Found. What exit code does it return without -f?", "opts": ["0 — use -f or check %{http_code}", "22", "404"], "a": 0, "expl": "For curl, any answer is a success. -f turns error codes into exit code twenty-two.", "ch": "Quick check", "anchor": "ch-8", "t": null}, {"type": "choice", "kind": "video", "q": "How do I POST JSON so the server knows it is JSON?", "opts": ["-d '{...}' alone", "-H 'Content-Type: application/json' -d '{...}' (or --json)", "-X JSON '{...}'"], "a": 1, "expl": "Plain -d sends a form. The content type header, or --json, tells the server it's J S O N.", "ch": "Quick check", "anchor": "ch-8", "t": null}]</script>
+<script src="../../sp.js"></script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  function embed(t,play){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+(t!=null?'?start='+t+(play?'&autoplay=1':''):'')+'" title="Lesson video" allow="encrypted-media; picture-in-picture; autoplay" allowfullscreen loading="lazy"></iframe>'; }
+  if(id){ embed(); }
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  if(!window.SP||!qs.length) return;
+  SP.quiz({root:document.getElementById('quiz-root'), questions:qs, id:'curl-api', review:function(q){
+    var out=[];
+    if(id&&q.t!=null) out.push({href:'#video', text:'▶ video at '+SP.fmtT(q.t), onclick:function(e){ e.preventDefault(); embed(q.t,true); v.scrollIntoView({behavior:'smooth'}); }});
+    if(q.anchor) out.push({href:'#'+q.anchor, text:'commands: '+q.ch});
+    return out;
+  }});
+})();
+</script>
+</body>
+</html>
