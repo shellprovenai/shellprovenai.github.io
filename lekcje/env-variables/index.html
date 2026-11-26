@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Environment variables explained: export, .env files, env, and why sudo drops them — ShellProven</title>
+<meta name="description" content="Why can&#x27;t your script see a variable you just set? See the difference between a shell variable and an exported one, the one-command form VAR=value cmd (and why VAR=x echo $VAR surprises you), load a .env file so child processes really get it with set -a, inspect and clean the environment with env, and keep a variable through sudo with --preserve-env.">
+<link rel="icon" href="../../img/profil.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Environment variables explained: export, .env files, env, and why sudo drops them — ShellProven">
+<meta property="og:description" content="Why can&#x27;t your script see a variable you just set? See the difference between a shell variable and an exported one, the one-command form VAR=value cmd (and why VAR=x echo $VAR surprises you), load a .env file so child processes really get it with set -a, inspect and clean the environment with env, and keep a variable through sudo with --preserve-env.">
+<meta property="og:image" content="https://shellprovenai.github.io/img/profil.png">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../"><img src="../../img/profil.png" alt="">ShellProven</a>
+  <nav class="nav"><a href="../">All lessons</a><a href="../../quiz/">Test yourself</a><a href="https://www.youtube.com/@ShellProven">YouTube</a><a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/env-variables" class="hide-s">Commands</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="lesson-head">
+    <span class="kicker">Lesson 19 · tested on Debian 13</span>
+    <h1>Environment variables explained: export, .env files, env, and why sudo drops them</h1>
+    <p class="sub">Why can&#x27;t your script see a variable you just set? See the difference between a shell variable and an exported one, the one-command form VAR=value cmd (and why VAR=x echo $VAR surprises you), load a .env file so child processes really get it with set -a, inspect and clean the environment with env, and keep a variable through sudo with --preserve-env.</p>
+  </div>
+
+  <div class="video" id="video" data-yt="">
+    <div class="ph">Video coming soon — <a href="https://www.youtube.com/@ShellProven" style="margin-left:6px">@ShellProven</a></div>
+  </div>
+
+  <section>
+      <h2>Commands</h2>
+      <p class="sub">Exactly as run in the video. Full folder with setup script and log: <a href="https://github.com/shellprovenai/terminal-tutorials/tree/main/env-variables">terminal-tutorials/env-variables</a>.</p>
+      <pre class="cmds"><code><span class="ch" id="ch-2"># Shell variable or environment variable?</span>
+$ GREETING=hello; bash -c 'echo "child sees: [$GREETING]"'
+child sees: []
+$ GREETING=hello; export GREETING; bash -c 'echo "child sees: [$GREETING]"'
+child sees: [hello]
+
+<span class="ch" id="ch-3"># Just for one command</span>
+$ GREETING=hi bash -c 'echo "child sees: [$GREETING]"'; echo "shell has: [$GREETING]"
+child sees: [hi]
+shell has: []
+$ GREETING=hi echo "[$GREETING]"
+[]
+
+<span class="ch" id="ch-4"># Inspect the environment with env</span>
+$ export GREETING=hello; env | grep -E '^(HOME|SHELL|GREETING)='
+HOME=/root
+GREETING=hello
+$ env -i bash -c 'echo "HOME=[$HOME] PATH=[$PATH]"'
+HOME=[] PATH=[/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:.]
+
+<span class="ch" id="ch-5"># .env files: the source trap</span>
+$ cat app.env
+DB_HOST=db.local
+DB_PORT=5432
+$ source app.env; echo "shell: $DB_HOST"; bash -c 'echo "child: [$DB_HOST]"'
+shell: db.local
+child: []
+$ set -a; source app.env; set +a; bash -c 'echo "child: [$DB_HOST:$DB_PORT]"'
+child: [db.local:5432]
+
+<span class="ch" id="ch-6"># Why sudo drops your variables</span>
+$ export DB_HOST=db.local; sudo printenv DB_HOST
+$ export DB_HOST=db.local; sudo --preserve-env=DB_HOST printenv DB_HOST
+db.local</code></pre>
+  </section>
+  <section class="quiz" id="quiz">
+      <h2>Quiz</h2>
+      <p class="sub">The two questions from the video. Your first answer to each question counts. Checked in your browser; your result is saved only in this browser — nothing is sent anywhere.</p>
+      <div id="quiz-root"><noscript>The quiz needs JavaScript.</noscript></div>
+  </section>
+
+  <section>
+    <div class="note">
+      <img src="../../img/profil.png" alt="">
+      <p><strong>Transparency.</strong> Script and narration made with AI, human-reviewed. The robot and the dog are AI-generated cartoon characters. The commands and their output are real runs in a container.</p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>© ShellProven · <a href="../../privacy.html">Privacy policy</a></span>
+  <span><a href="https://www.youtube.com/@ShellProven">YouTube</a> · <a href="https://github.com/shellprovenai">GitHub</a></span>
+</div></footer>
+
+<script id="quiz-data" type="application/json">[{"type": "choice", "kind": "video", "q": "I ran source app.env, but my script still doesn't see DB_HOST. Why?", "opts": ["The file must be called .env", "The variables aren't exported. Use set -a before source", "Scripts can't read variables"], "a": 1, "expl": "Sourcing sets shell variables only. set -a exports everything assigned while it's on.", "ch": "Quick check", "anchor": "ch-7", "t": null}, {"type": "choice", "kind": "video", "q": "sudo printenv DB_HOST prints nothing. How do I keep just that variable?", "opts": ["sudo -s printenv DB_HOST", "sudo --preserve-env=DB_HOST printenv DB_HOST", "export DB_HOST twice"], "a": 1, "expl": "Sudo resets the environment. --preserve-env with a name lets exactly that variable through.", "ch": "Quick check", "anchor": "ch-7", "t": null}]</script>
+<script src="../../sp.js"></script>
+<script>
+(function(){
+  // video embed (only when the ID is known) — youtube-nocookie keeps the page free of tracking cookies
+  var v=document.getElementById('video'), id=v.getAttribute('data-yt');
+  function embed(t,play){ v.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+(t!=null?'?start='+t+(play?'&autoplay=1':''):'')+'" title="Lesson video" allow="encrypted-media; picture-in-picture; autoplay" allowfullscreen loading="lazy"></iframe>'; }
+  if(id){ embed(); }
+  var qs=[]; try{ qs=JSON.parse(document.getElementById('quiz-data').textContent)||[]; }catch(e){}
+  if(!window.SP||!qs.length) return;
+  SP.quiz({root:document.getElementById('quiz-root'), questions:qs, id:'env-variables', review:function(q){
+    var out=[];
+    if(id&&q.t!=null) out.push({href:'#video', text:'▶ video at '+SP.fmtT(q.t), onclick:function(e){ e.preventDefault(); embed(q.t,true); v.scrollIntoView({behavior:'smooth'}); }});
+    if(q.anchor) out.push({href:'#'+q.anchor, text:'commands: '+q.ch});
+    return out;
+  }});
+})();
+</script>
+</body>
+</html>
