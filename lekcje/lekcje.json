@@ -162,6 +162,24 @@
    "quiz": 10,
    "pool": 10,
    "practice": true
+  },
+  {
+   "num": "19",
+   "slug": "env-variables",
+   "title": "Environment variables explained: export, .env files, env, and why sudo drops them",
+   "youtube_id": "",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
+  },
+  {
+   "num": "20",
+   "slug": "curl-api",
+   "title": "curl for APIs: headers, JSON bodies, timings, cookies, and the status code trap in scripts",
+   "youtube_id": "",
+   "quiz": 2,
+   "pool": 0,
+   "practice": false
   }
  ]
 }
